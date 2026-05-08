@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut } from 'lucide-react';
+import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut, Package } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
-import { getUserData, updateUserProfile, fetchUserListings } from '../services/firestoreService.js';
+import { getUserData, updateUserProfile, fetchUserListings, fetchCompletedListings } from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
 
 interface UserProfile {
@@ -23,6 +23,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [totalListings, setTotalListings] = useState(0);
+  const [completedListings, setCompletedListings] = useState(0);
 
   useEffect(() => {
     loadUserProfile();
@@ -43,6 +44,10 @@ const ProfilePage = () => {
       // Fetch user's listings
       const listings = await fetchUserListings(currentUser.uid);
       setTotalListings(listings.length);
+
+      // Fetch completed listings
+      const completed = await fetchCompletedListings(currentUser.uid);
+      setCompletedListings(completed.length);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load profile';
       setError(errorMessage);
@@ -262,7 +267,7 @@ const ProfilePage = () => {
               <div className="text-slate-300">Active Listings</div>
             </motion.div>
             <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">0</div>
+              <div className="text-3xl font-semibold text-white mb-2">{completedListings}</div>
               <div className="text-slate-300">Completed Exchanges</div>
             </motion.div>
           </div>
@@ -270,18 +275,33 @@ const ProfilePage = () => {
           <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-xl">
             <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
             <div className="space-y-4">
-              {totalListings === 0 ? (
+              {totalListings === 0 && completedListings === 0 ? (
                 <p className="text-slate-300 text-center py-8">No listings yet. Create your first listing!</p>
               ) : (
-                <div className="flex items-center justify-between py-3 border-b border-white/10">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="h-5 w-5 text-emerald-400" />
-                    <div>
-                      <p className="font-medium text-slate-100">Total listings created</p>
-                      <p className="text-sm text-slate-300">You have {totalListings} active listing{totalListings !== 1 ? 's' : ''}</p>
+                <>
+                  {totalListings > 0 && (
+                    <div className="flex items-center justify-between py-3 border-b border-white/10">
+                      <div className="flex items-center space-x-3">
+                        <Package className="h-5 w-5 text-blue-400" />
+                        <div>
+                          <p className="font-medium text-slate-100">Total listings created</p>
+                          <p className="text-sm text-slate-300">You have {totalListings} active listing{totalListings !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+                  {completedListings > 0 && (
+                    <div className="flex items-center justify-between py-3 border-b border-white/10">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle className="h-5 w-5 text-emerald-400" />
+                        <div>
+                          <p className="font-medium text-slate-100">Completed exchanges</p>
+                          <p className="text-sm text-slate-300">You have completed {completedListings} exchange{completedListings !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

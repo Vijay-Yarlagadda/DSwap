@@ -134,6 +134,19 @@ export const updateListingAmount = async (listingId, amount) => {
   }
 };
 
+export const completeListing = async (listingId) => {
+  try {
+    const listingRef = doc(db, LISTINGS_COLLECTION, listingId);
+    await updateDoc(listingRef, {
+      completed: true,
+      completedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    throw formatFirestoreError(error, 'Failed to complete listing.');
+  }
+};
+
 export const deleteListing = async (listingId) => {
   try {
     const listingRef = doc(db, LISTINGS_COLLECTION, listingId);
@@ -163,5 +176,22 @@ export const fetchUserListings = async (uid) => {
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load your listings.');
+  }
+};
+
+export const fetchCompletedListings = async (uid) => {
+  try {
+    const listingsRef = collection(db, LISTINGS_COLLECTION);
+    const q = query(listingsRef, where('userId', '==', uid), where('completed', '==', true));
+    const snapshot = await getDocs(q);
+    const listings = snapshot.docs
+      .map((listingDoc) => ({
+        id: listingDoc.id,
+        ...listingDoc.data(),
+      }))
+      .filter((listing) => isValidListingData(listing));
+    return sortByLatest(listings);
+  } catch (error) {
+    throw formatFirestoreError(error, 'Failed to load completed listings.');
   }
 };

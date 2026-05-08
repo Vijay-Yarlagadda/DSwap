@@ -1,7 +1,7 @@
-import { MapPin, User, Clock, Phone, Trash2 } from 'lucide-react';
+import { MapPin, User, Clock, Phone, Trash2, MoreVertical, Edit, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
-import { deleteListing } from '../services/firestoreService.js';
-import { motion } from 'framer-motion';
+import { deleteListing, completeListing } from '../services/firestoreService.js';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Listing {
   id?: string;
@@ -17,10 +17,14 @@ interface Listing {
 interface ListingCardProps {
   listing: Listing;
   onListingDeleted?: () => void;
+  onListingCompleted?: () => void;
+  onListingEdited?: () => void;
 }
 
-const ListingCard = ({ listing, onListingDeleted }: ListingCardProps) => {
+const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingEdited }: ListingCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this listing?')) {
@@ -37,6 +41,29 @@ const ListingCard = ({ listing, onListingDeleted }: ListingCardProps) => {
         setIsDeleting(false);
       }
     }
+  };
+
+  const handleComplete = async () => {
+    if (window.confirm('Mark this listing as completed?')) {
+      setIsCompleting(true);
+      try {
+        if (listing.id) {
+          await completeListing(listing.id);
+          onListingCompleted?.();
+        }
+      } catch (error) {
+        console.error('Error completing listing:', error);
+        alert('Failed to complete listing');
+      } finally {
+        setIsCompleting(false);
+      }
+    }
+  };
+
+  const handleEdit = () => {
+    // For now, just close the menu. Edit functionality can be added later
+    setShowMenu(false);
+    onListingEdited?.();
   };
 
   const handleContact = () => {
@@ -70,17 +97,53 @@ const ListingCard = ({ listing, onListingDeleted }: ListingCardProps) => {
         </div>
 
         {listing.isOwn && (
-          <div className="flex space-x-2">
+          <div className="relative">
             <motion.button
-              onClick={handleDelete}
-              disabled={isDeleting}
+              onClick={() => setShowMenu(!showMenu)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="rounded-xl border border-rose-300/30 bg-rose-500/10 p-2 text-rose-300 transition hover:bg-rose-500/20 disabled:opacity-50"
-              title="Delete listing"
+              className="rounded-xl border border-white/20 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
+              title="More options"
             >
-              <Trash2 className="h-4 w-4" />
+              <MoreVertical className="h-4 w-4" />
             </motion.button>
+
+            <AnimatePresence>
+              {showMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  className="absolute right-0 top-12 z-50 w-48 overflow-hidden rounded-xl border border-white/15 bg-slate-900/95 shadow-[0_20px_60px_rgba(2,6,23,0.6)] backdrop-blur-2xl"
+                >
+                  <div className="py-1">
+                    <button
+                      onClick={handleEdit}
+                      className="flex w-full items-center px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
+                    >
+                      <Edit className="mr-3 h-4 w-4" />
+                      Edit
+                    </button>
+                    <button
+                      onClick={handleComplete}
+                      disabled={isCompleting}
+                      className="flex w-full items-center px-4 py-2 text-sm text-emerald-300 transition hover:bg-emerald-500/20 disabled:opacity-50"
+                    >
+                      <CheckCircle className="mr-3 h-4 w-4" />
+                      {isCompleting ? 'Completing...' : 'DSwap Done'}
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="flex w-full items-center px-4 py-2 text-sm text-rose-300 transition hover:bg-rose-500/20 disabled:opacity-50"
+                    >
+                      <Trash2 className="mr-3 h-4 w-4" />
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>
