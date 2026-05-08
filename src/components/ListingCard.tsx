@@ -1,6 +1,6 @@
 import { MapPin, User, Clock, Phone, Trash2, MoreVertical, Edit, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
-import { deleteListing, completeListing } from '../services/firestoreService.js';
+import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Listing {
@@ -25,6 +25,9 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editAmount, setEditAmount] = useState(listing.amount.toString());
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this listing?')) {
@@ -44,7 +47,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   };
 
   const handleComplete = async () => {
-    if (window.confirm('Mark this listing as completed?')) {
+    if (window.confirm('Are you sure you want to complete this exchange? This will mark it as completed.')) {
       setIsCompleting(true);
       try {
         if (listing.id) {
@@ -61,9 +64,36 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   };
 
   const handleEdit = () => {
-    // For now, just close the menu. Edit functionality can be added later
+    setEditAmount(listing.amount.toString());
+    setIsEditing(true);
     setShowMenu(false);
-    onListingEdited?.();
+  };
+
+  const handleSaveEdit = async () => {
+    const newAmount = parseFloat(editAmount);
+    if (isNaN(newAmount) || newAmount <= 0) {
+      alert('Please enter a valid amount');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      if (listing.id) {
+        await updateListingAmount(listing.id, newAmount);
+        onListingEdited?.();
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error('Error updating listing:', error);
+      alert('Failed to update listing');
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditAmount(listing.amount.toString());
   };
 
   const handleContact = () => {
@@ -83,13 +113,53 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-500/15 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex justify-between items-start mb-4">
         <div>
-          <motion.h3
-            initial={{ opacity: 0.7, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-3xl font-semibold tracking-tight text-white"
-          >
-            ₹{listing.amount}
-          </motion.h3>
+          {isEditing ? (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-3"
+            >
+              <div className="flex items-center space-x-2">
+                <span className="text-2xl font-semibold text-white">₹</span>
+                <input
+                  type="number"
+                  value={editAmount}
+                  onChange={(e) => setEditAmount(e.target.value)}
+                  className="w-24 rounded-lg border border-white/20 bg-white/10 px-2 py-1 text-xl font-semibold text-white outline-none focus:border-primary-300/70 focus:bg-white/15"
+                  placeholder="Amount"
+                  min="1"
+                  step="0.01"
+                />
+              </div>
+              <div className="flex space-x-2">
+                <motion.button
+                  onClick={handleSaveEdit}
+                  disabled={isUpdating}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="rounded-lg bg-primary-600 px-3 py-1 text-sm text-white transition hover:bg-primary-500 disabled:opacity-50"
+                >
+                  {isUpdating ? 'Saving...' : 'Save'}
+                </motion.button>
+                <motion.button
+                  onClick={handleCancelEdit}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="rounded-lg border border-white/20 bg-white/5 px-3 py-1 text-sm text-slate-300 transition hover:bg-white/10"
+                >
+                  Cancel
+                </motion.button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.h3
+              initial={{ opacity: 0.7, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-3xl font-semibold tracking-tight text-white"
+            >
+              ₹{listing.amount}
+            </motion.h3>
+          )}
           <div className="mt-2 inline-flex items-center rounded-full border border-primary-300/30 bg-primary-500/15 px-3 py-1 text-xs text-primary-100">
             <MapPin className="mr-1 h-3.5 w-3.5" />
             <span>{listing.location}</span>

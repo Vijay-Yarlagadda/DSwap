@@ -126,6 +126,8 @@ const DashboardPage = () => {
                 key={listing.id} 
                 listing={listing}
                 onListingDeleted={handleListingAdded}
+                onListingCompleted={handleListingAdded}
+                onListingEdited={handleListingAdded}
               />
             ))}
           </motion.div>

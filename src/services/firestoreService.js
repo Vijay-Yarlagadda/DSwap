@@ -114,7 +114,7 @@ export const getListings = async ({ location } = {}) => {
         id: listingDoc.id,
         ...listingDoc.data(),
       }))
-      .filter((listing) => isValidListingData(listing));
+      .filter((listing) => isValidListingData(listing) && !listing.completed);
 
     return sortByLatest(listings);
   } catch (error) {
@@ -172,7 +172,7 @@ export const fetchUserListings = async (uid) => {
         id: listingDoc.id,
         ...listingDoc.data(),
       }))
-      .filter((listing) => isValidListingData(listing));
+      .filter((listing) => isValidListingData(listing) && !listing.completed);
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load your listings.');
