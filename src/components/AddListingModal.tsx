@@ -1,26 +1,80 @@
 import { useState } from 'react';
-import { X, MapPin, Phone, FileText } from 'lucide-react';
+import { X, MapPin, Phone, FileText, AlertCircle } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import { addListing } from '../services/firestoreService';
 
 interface AddListingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onListingAdded?: () => void;
 }
 
-const AddListingModal = ({ isOpen, onClose }: AddListingModalProps) => {
+const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalProps) => {
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     amount: '',
     location: '',
     phone: '',
-    notes: '',
+    name: '',
+    department: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const locations = ['Block A', 'Block B', 'Block C', 'Library', 'Lakeview', 'Cuisine'];
+  const departments = [
+    'Computer Science',
+    'Electrical Engineering',
+    'Mechanical Engineering',
+    'Civil Engineering',
+    'Chemical Engineering',
+    'Biotechnology',
+    'Business Administration',
+    'Liberal Arts',
+    'Engineering Technology'
+  ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log(formData);
-    onClose();
+    setError('');
+
+    if (!currentUser) {
+      setError('You must be logged in to add a listing');
+      return;
+    }
+
+    if (!formData.amount || !formData.location || !formData.phone || !formData.name || !formData.department) {
+      setError('Please fill in all required fields');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await addListing(currentUser.uid, {
+        name: formData.name,
+        department: formData.department,
+        phone: formData.phone,
+        location: formData.location,
+        amount: parseInt(formData.amount),
+      });
+
+      setFormData({
+        amount: '',
+        location: '',
+        phone: '',
+        name: '',
+        department: '',
+      });
+
+      onListingAdded?.();
+      onClose();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add listing';
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -39,7 +93,41 @@ const AddListingModal = ({ isOpen, onClose }: AddListingModalProps) => {
             </button>
           </div>
 
+          {error && (
+            <div className="mb-4 flex items-start gap-2 rounded-lg border border-rose-300/40 bg-rose-500/10 p-3 text-sm text-rose-700">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <select
+                value={formData.department}
+                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                className="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors appearance-none"
+                required
+              >
+                <option value="">Select Department</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="relative">
               <span className="absolute left-3 top-3 text-primary-600 font-medium">₹</span>
               <input
@@ -81,30 +169,21 @@ const AddListingModal = ({ isOpen, onClose }: AddListingModalProps) => {
               />
             </div>
 
-            <div className="relative">
-              <FileText className="absolute left-3 top-3 h-5 w-5 text-primary-400" />
-              <textarea
-                placeholder="Notes (optional)"
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors resize-none"
-                rows={3}
-              />
-            </div>
-
             <div className="flex space-x-3 pt-4">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-primary-50 text-primary-700 py-3 rounded-lg hover:bg-primary-100 transition-colors font-medium"
+                disabled={isLoading}
+                className="flex-1 bg-primary-50 text-primary-700 py-3 rounded-lg hover:bg-primary-100 transition-colors font-medium disabled:opacity-70"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium"
+                disabled={isLoading}
+                className="flex-1 bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-70"
               >
-                Add Listing
+                {isLoading ? 'Adding...' : 'Add Listing'}
               </button>
             </div>
           </form>

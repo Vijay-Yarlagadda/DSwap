@@ -1,20 +1,49 @@
-import { MapPin, User, Clock, Phone, Edit, Trash2 } from 'lucide-react';
+import { MapPin, User, Clock, Phone, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { deleteListing } from '../services/firestoreService';
 
 interface Listing {
-  id: number;
+  id?: string;
   amount: number;
   location: string;
   name: string;
   department: string;
+  phone: string;
   lastUpdated: string;
   isOwn: boolean;
 }
 
 interface ListingCardProps {
   listing: Listing;
+  onListingDeleted?: () => void;
 }
 
-const ListingCard = ({ listing }: ListingCardProps) => {
+const ListingCard = ({ listing, onListingDeleted }: ListingCardProps) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (window.confirm('Are you sure you want to delete this listing?')) {
+      setIsDeleting(true);
+      try {
+        if (listing.id) {
+          await deleteListing(listing.id);
+          onListingDeleted?.();
+        }
+      } catch (error) {
+        console.error('Error deleting listing:', error);
+        alert('Failed to delete listing');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleContact = () => {
+    if (listing.phone) {
+      window.location.href = `tel:${listing.phone}`;
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow p-6 border border-primary-100">
       <div className="flex justify-between items-start mb-4">
@@ -28,10 +57,12 @@ const ListingCard = ({ listing }: ListingCardProps) => {
 
         {listing.isOwn && (
           <div className="flex space-x-2">
-            <button className="p-2 text-primary-400 hover:text-primary-600 transition-colors">
-              <Edit className="h-4 w-4" />
-            </button>
-            <button className="p-2 text-red-400 hover:text-red-600 transition-colors">
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="p-2 text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
+              title="Delete listing"
+            >
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
@@ -50,9 +81,12 @@ const ListingCard = ({ listing }: ListingCardProps) => {
         </div>
       </div>
 
-      <button className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center justify-center space-x-2">
+      <button
+        onClick={handleContact}
+        className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium flex items-center justify-center space-x-2"
+      >
         <Phone className="h-4 w-4" />
-        <span>Contact</span>
+        <span>Contact {listing.phone}</span>
       </button>
     </div>
   );

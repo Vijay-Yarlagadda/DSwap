@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
-import { googleLogin } from '../services/authService';
+import { signup, login, signInWithGoogle } from '../services/authService';
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -11,16 +11,55 @@ const AuthForm = () => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [department, setDepartment] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSuccess(true);
     setAuthError('');
-    setTimeout(() => navigate('/dashboard'), 550);
+    setIsLoading(true);
+
+    try {
+      if (isSignUp) {
+        // Validate signup fields
+        if (!name || !email || !password || !phone || !department) {
+          throw new Error('Please fill in all fields');
+        }
+        
+        await signup({
+          email,
+          password,
+          name,
+          department,
+          phone,
+        });
+      } else {
+        // Login
+        if (!email || !password) {
+          throw new Error('Please enter email and password');
+        }
+        await login({
+          email,
+          password,
+        });
+      }
+
+      setIsSuccess(true);
+      setTimeout(() => navigate('/dashboard'), 550);
+    } catch (error) {
+      const fallbackError = isSignUp ? 'Sign up failed. Please try again.' : 'Sign in failed. Please try again.';
+      if (error instanceof Error) {
+        setAuthError(error.message || fallbackError);
+      } else {
+        setAuthError(fallbackError);
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGoogleSignIn = async () => {
@@ -28,7 +67,7 @@ const AuthForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      await googleLogin();
+      await signInWithGoogle();
       setIsSuccess(true);
       setTimeout(() => navigate('/dashboard'), 550);
     } catch (error) {
@@ -109,14 +148,13 @@ const AuthForm = () => {
                     <Building className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300" />
                     <select
                       className={`${inputClassName} appearance-none`}
-                      defaultValue=""
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
                     >
-                      <option value="" disabled>
-                        Department
-                      </option>
-                      {DEPARTMENTS.map((department) => (
-                        <option key={department} value={department} className="text-slate-900">
-                          {department}
+                      <option value="">Select Department</option>
+                      {DEPARTMENTS.map((dept) => (
+                        <option key={dept} value={dept} className="text-slate-900">
+                          {dept}
                         </option>
                       ))}
                     </select>
@@ -168,12 +206,13 @@ const AuthForm = () => {
 
               <motion.button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 py-3 font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.45)] transition"
-                whileHover={{ scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 py-3 font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.45)] transition disabled:opacity-70 disabled:cursor-not-allowed"
+                whileHover={{ scale: isLoading ? 1 : 1.01 }}
+                whileTap={{ scale: isLoading ? 1 : 0.98 }}
               >
-                {isSignUp ? 'Create account' : 'Sign in'}
-                <ArrowRight className="h-4 w-4" />
+                {isLoading ? 'Processing...' : isSignUp ? 'Create account' : 'Sign in'}
+                {!isLoading && <ArrowRight className="h-4 w-4" />}
               </motion.button>
             </motion.form>
           </AnimatePresence>
