@@ -5,8 +5,8 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
-import { auth, db } from '../firebase/config';
-import { doc, setDoc } from 'firebase/firestore';
+import { auth } from '../firebase/firebase.js';
+import { saveUserData } from './firestoreService.js';
 
 interface SignupData {
   email: string;
@@ -24,14 +24,12 @@ interface LoginData {
 // Create or update user in Firestore
 const saveUserToFirestore = async (user: User, userData?: Omit<SignupData, 'email' | 'password'>) => {
   try {
-    const userRef = doc(db, 'users', user.uid);
-    
-    await setDoc(userRef, {
-      email: user.email,
+    await saveUserData(user.uid, {
+      email: user.email ?? '',
       name: userData?.name || user.displayName || '',
       department: userData?.department || '',
       phone: userData?.phone || '',
-    }, { merge: true });
+    });
   } catch (error) {
     console.error('Error saving user to Firestore:', error);
     throw error;

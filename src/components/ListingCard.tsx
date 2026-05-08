@@ -1,6 +1,6 @@
 import { MapPin, User, Clock, Phone, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { deleteListing } from '../services/firestoreService';
+import { deleteListing } from '../services/firestoreService.js';
 
 interface Listing {
   id?: string;

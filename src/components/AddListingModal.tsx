@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, MapPin, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { addListing } from '../services/firestoreService';
+import { addListing, getUserData } from '../services/firestoreService.js';
+import { DEPARTMENTS } from '../constants/departments';
 
 interface AddListingModalProps {
   isOpen: boolean;
@@ -22,17 +23,33 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
   const [error, setError] = useState('');
 
   const locations = ['Block A', 'Block B', 'Block C', 'Library', 'Lakeview', 'Cuisine'];
-  const departments = [
-    'Computer Science',
-    'Electrical Engineering',
-    'Mechanical Engineering',
-    'Civil Engineering',
-    'Chemical Engineering',
-    'Biotechnology',
-    'Business Administration',
-    'Liberal Arts',
-    'Engineering Technology'
-  ];
+
+  useEffect(() => {
+    const autoFillUserData = async () => {
+      if (!isOpen || !currentUser) {
+        return;
+      }
+
+      try {
+        const userData = await getUserData(currentUser.uid);
+        if (!userData) {
+          return;
+        }
+
+        setFormData((current) => ({
+          ...current,
+          name: current.name || userData.name || '',
+          department: current.department || userData.department || '',
+          phone: current.phone || userData.phone || '',
+        }));
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load your profile details';
+        setError(errorMessage);
+      }
+    };
+
+    autoFillUserData();
+  }, [isOpen, currentUser]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +137,7 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                 required
               >
                 <option value="">Select Department</option>
-                {departments.map((dept) => (
+                {DEPARTMENTS.map((dept) => (
                   <option key={dept} value={dept}>
                     {dept}
                   </option>

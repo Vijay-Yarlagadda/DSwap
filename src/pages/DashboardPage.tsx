@@ -4,8 +4,19 @@ import FilterChips from '../components/FilterChips';
 import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
-import { fetchListings } from '../services/firestoreService';
-import type { Listing } from '../services/firestoreService';
+import { getListings } from '../services/firestoreService.js';
+
+interface Listing {
+  id?: string;
+  name: string;
+  department: string;
+  phone: string;
+  location: string;
+  amount: number;
+  userId: string;
+  createdAt?: { seconds: number };
+  updatedAt?: { seconds: number };
+}
 
 interface ListingDisplay extends Listing {
   lastUpdated: string;
@@ -23,16 +34,18 @@ const DashboardPage = () => {
 
   useEffect(() => {
     loadListings();
-  }, [currentUser]);
+  }, [currentUser, activeFilter]);
 
   const loadListings = async () => {
     try {
       setIsLoading(true);
-      const firestoreListings = await fetchListings();
+      const firestoreListings = await getListings({
+        location: activeFilter === 'All' ? undefined : activeFilter,
+      });
       
       const displayListings: ListingDisplay[] = firestoreListings.map((listing) => ({
         ...listing,
-        lastUpdated: '2 hours ago', // You can calculate this from timestamps in Firestore
+        lastUpdated: 'Just now',
         isOwn: listing.userId === currentUser?.uid,
       }));
 
@@ -43,10 +56,6 @@ const DashboardPage = () => {
       setIsLoading(false);
     }
   };
-
-  const filteredListings = activeFilter === 'All' 
-    ? listings 
-    : listings.filter(listing => listing.location === activeFilter);
 
   const handleListingAdded = () => {
     loadListings();
@@ -70,7 +79,7 @@ const DashboardPage = () => {
               <p className="text-primary-600">Loading listings...</p>
             </div>
           </div>
-        ) : filteredListings.length === 0 ? (
+        ) : listings.length === 0 ? (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <p className="text-primary-600 text-lg">No listings available</p>
@@ -79,7 +88,7 @@ const DashboardPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
-            {filteredListings.map((listing) => (
+            {listings.map((listing) => (
               <ListingCard 
                 key={listing.id} 
                 listing={listing}

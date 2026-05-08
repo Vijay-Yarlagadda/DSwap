@@ -3,8 +3,14 @@ import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle,
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
-import { getUserDetails, updateUserProfile, fetchUserListings } from '../services/firestoreService';
-import type { UserProfile } from '../services/firestoreService';
+import { getUserData, updateUserProfile, fetchUserListings } from '../services/firestoreService.js';
+
+interface UserProfile {
+  email: string;
+  name: string;
+  department: string;
+  phone: string;
+}
 
 const ProfilePage = () => {
   const { currentUser, logout } = useAuth();
@@ -29,7 +35,7 @@ const ProfilePage = () => {
       setError('');
 
       // Fetch user details
-      const userDetails = await getUserDetails(currentUser.uid);
+      const userDetails = await getUserData(currentUser.uid);
       setProfile(userDetails);
       setEditedProfile(userDetails);
 
