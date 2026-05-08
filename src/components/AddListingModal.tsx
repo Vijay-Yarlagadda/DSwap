@@ -114,8 +114,11 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
         >
           <div className="p-6">
             <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-semibold text-white">Add Listing</h2>
-              <button onClick={onClose} className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10">
+              <div>
+                <h2 className="text-2xl font-semibold text-white">Add Listing</h2>
+                <p className="text-sm text-slate-400">Create a new exchange with premium campus style.</p>
+              </div>
+              <button onClick={onClose} className="rounded-xl p-2 text-slate-300 transition hover:bg-white/10">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -210,16 +213,16 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   type="button"
                   onClick={onClose}
                   disabled={isLoading}
-                  className="flex-1 rounded-xl border border-white/15 bg-white/5 py-3 font-medium text-slate-200 transition hover:bg-white/10 disabled:opacity-70"
+                  className="flex-1 rounded-xl border border-white/15 bg-slate-900/70 py-3 font-medium text-slate-200 transition hover:bg-slate-800/80 disabled:opacity-70"
                 >
                   Cancel
                 </button>
                 <motion.button
                   type="submit"
                   disabled={isLoading}
-                  whileHover={{ scale: isLoading ? 1 : 1.01 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.99 }}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 py-3 font-medium text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)] transition disabled:opacity-70"
+                  whileHover={{ scale: isLoading ? 1 : 1.02, y: isLoading ? 0 : -1 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 py-3 font-semibold text-white shadow-[0_18px_50px_rgba(59,130,246,0.28)] transition duration-200 disabled:opacity-70 hover:shadow-[0_20px_65px_rgba(59,130,246,0.32)]"
                 >
                   {isLoading ? 'Adding...' : 'Add Listing'}
                 </motion.button>

@@ -35,13 +35,13 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
 
           <div className="hidden flex-1 max-w-2xl md:block">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Search listings..."
                 value={searchValue}
                 onChange={(event) => setSearchValue(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-slate-950/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/85 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+                className="w-full rounded-2xl border border-white/15 bg-slate-900/80 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition duration-300 placeholder:text-slate-500 focus:border-sky-400/70 focus:bg-slate-950/90 focus:ring-2 focus:ring-sky-500/20"
               />
             </div>
           </div>
@@ -49,9 +49,9 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
           <div className="flex items-center space-x-3">
             <motion.button
               onClick={onAddListing}
-              whileHover={{ scale: 1.02, y: -1 }}
+              whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)] transition"
+              className="flex items-center space-x-2 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(59,130,246,0.24)] transition duration-200 hover:shadow-[0_20px_70px_rgba(59,130,246,0.3)]"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">Add Listing</span>
@@ -109,7 +109,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
               placeholder="Search listings..."
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-slate-950/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/85 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
+              className="w-full rounded-2xl border border-white/15 bg-slate-900/80 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition duration-300 placeholder:text-slate-500 focus:border-sky-400/70 focus:bg-slate-950/90 focus:ring-2 focus:ring-sky-500/20"
             />
           </div>
         </div>

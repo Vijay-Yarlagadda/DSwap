@@ -258,17 +258,17 @@ const ProfilePage = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-xl">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
               <div className="text-3xl font-semibold text-white mb-2">{totalListings}</div>
-              <div className="text-slate-300">My Listings</div>
+              <div className="text-slate-400">Active Listings</div>
             </motion.div>
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">0</div>
-              <div className="text-slate-300">Active Listings</div>
-            </motion.div>
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-xl">
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
               <div className="text-3xl font-semibold text-white mb-2">{completedListings}</div>
-              <div className="text-slate-300">Completed Exchanges</div>
+              <div className="text-slate-400">Completed Exchanges</div>
+            </motion.div>
+            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 text-center backdrop-blur-xl">
+              <div className="text-3xl font-semibold text-white mb-2">{totalListings + completedListings}</div>
+              <div className="text-slate-400">Total Exchanges</div>
             </motion.div>
           </div>
 
@@ -282,10 +282,10 @@ const ProfilePage = () => {
                   {totalListings > 0 && (
                     <div className="flex items-center justify-between py-3 border-b border-white/10">
                       <div className="flex items-center space-x-3">
-                        <Package className="h-5 w-5 text-blue-400" />
+                        <Package className="h-5 w-5 text-sky-400" />
                         <div>
-                          <p className="font-medium text-slate-100">Total listings created</p>
-                          <p className="text-sm text-slate-300">You have {totalListings} active listing{totalListings !== 1 ? 's' : ''}</p>
+                          <p className="font-medium text-slate-100">Active listings</p>
+                          <p className="text-sm text-slate-300">You have {totalListings} listing{totalListings !== 1 ? 's' : ''} available</p>
                         </div>
                       </div>
                     </div>

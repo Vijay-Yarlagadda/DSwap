@@ -108,9 +108,9 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, scale: 1.01 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.07] p-6 shadow-[0_20px_45px_rgba(2,6,23,0.45)] backdrop-blur-xl"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900/80 p-6 shadow-[0_30px_60px_rgba(3,12,39,0.45)] ring-1 ring-white/5 backdrop-blur-xl"
     >
-      <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-primary-500/15 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
+      <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full bg-sky-500/10 blur-3xl transition-opacity duration-300 group-hover:opacity-100" />
       <div className="flex justify-between items-start mb-4">
         <div>
           {isEditing ? (
@@ -160,8 +160,8 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
               ₹{listing.amount}
             </motion.h3>
           )}
-          <div className="mt-2 inline-flex items-center rounded-full border border-primary-300/30 bg-primary-500/15 px-3 py-1 text-xs text-primary-100">
-            <MapPin className="mr-1 h-3.5 w-3.5" />
+          <div className="mt-2 inline-flex items-center rounded-full border border-sky-400/20 bg-sky-500/10 px-3 py-1 text-xs text-sky-100">
+            <MapPin className="mr-1 h-3.5 w-3.5 text-sky-200" />
             <span>{listing.location}</span>
           </div>
         </div>
@@ -172,7 +172,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
               onClick={() => setShowMenu(!showMenu)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="rounded-xl border border-white/20 bg-white/5 p-2 text-slate-300 transition hover:bg-white/10"
+              className="rounded-xl border border-white/15 bg-slate-900/90 p-2 text-slate-200 transition hover:bg-slate-800/90"
               title="More options"
             >
               <MoreVertical className="h-4 w-4" />
@@ -184,7 +184,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                   initial={{ opacity: 0, y: 8, scale: 0.98 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                  className="absolute right-0 top-12 z-50 w-48 overflow-hidden rounded-xl border border-white/15 bg-slate-900/95 shadow-[0_20px_60px_rgba(2,6,23,0.6)] backdrop-blur-2xl"
+                  className="absolute right-0 top-12 z-50 w-48 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/95 shadow-[0_30px_80px_rgba(3,12,39,0.55)] backdrop-blur-3xl"
                 >
                   <div className="py-1">
                     <button
@@ -197,7 +197,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                     <button
                       onClick={handleComplete}
                       disabled={isCompleting}
-                      className="flex w-full items-center px-4 py-2 text-sm text-emerald-300 transition hover:bg-emerald-500/20 disabled:opacity-50"
+                      className="flex w-full items-center px-4 py-2 text-sm text-emerald-200 transition hover:bg-emerald-500/15 disabled:opacity-50"
                     >
                       <CheckCircle className="mr-3 h-4 w-4" />
                       {isCompleting ? 'Completing...' : 'DSwap Done'}
@@ -205,7 +205,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                     <button
                       onClick={handleDelete}
                       disabled={isDeleting}
-                      className="flex w-full items-center px-4 py-2 text-sm text-rose-300 transition hover:bg-rose-500/20 disabled:opacity-50"
+                      className="flex w-full items-center px-4 py-2 text-sm text-rose-200 transition hover:bg-rose-500/15 disabled:opacity-50"
                     >
                       <Trash2 className="mr-3 h-4 w-4" />
                       Delete
@@ -232,9 +232,9 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
       <motion.button
         onClick={handleContact}
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        className="flex w-full items-center justify-center space-x-2 rounded-xl border border-primary-300/40 bg-gradient-to-r from-primary-500/85 to-primary-600/85 py-3 font-medium text-white transition"
+        whileHover={{ scale: 1.03, y: -1 }}
+        whileTap={{ scale: 0.98 }}
+        className="flex w-full items-center justify-center space-x-2 rounded-2xl border border-sky-400/20 bg-gradient-to-r from-emerald-500 via-cyan-500 to-sky-500 py-3 font-semibold text-white shadow-[0_18px_50px_rgba(14,116,144,0.28)] transition duration-200 hover:shadow-[0_20px_65px_rgba(14,116,144,0.32)]"
       >
         <Phone className="h-4 w-4" />
         <span>Contact {listing.phone}</span>
