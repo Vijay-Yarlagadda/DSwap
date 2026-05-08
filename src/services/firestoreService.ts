@@ -7,7 +7,8 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  Timestamp
+  Timestamp,
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
@@ -20,6 +21,40 @@ export interface Listing {
   amount: number;
   userId: string;
 }
+
+export interface UserProfile {
+  email: string;
+  name: string;
+  department: string;
+  phone: string;
+}
+
+// Get user details
+export const getUserDetails = async (userId: string): Promise<UserProfile | null> => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    const snapshot = await getDoc(userRef);
+    
+    if (snapshot.exists()) {
+      return snapshot.data() as UserProfile;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
+
+// Update user profile
+export const updateUserProfile = async (userId: string, updates: Partial<UserProfile>) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, updates);
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+};
 
 // Add a new listing
 export const addListing = async (userId: string, listingData: Omit<Listing, 'id' | 'userId'>) => {
@@ -105,12 +140,11 @@ export const deleteListing = async (listingId: string) => {
 };
 
 // Fetch user details
-export const fetchUserDetails = async (userId: string) => {
+export const fetchUserDetailsLegacy = async (userId: string) => {
   try {
-    const userRef = doc(db, 'users', userId);
     const snapshot = await getDocs(collection(db, 'users'));
-    
     let userDetails = null;
+
     snapshot.forEach((doc) => {
       if (doc.id === userId) {
         userDetails = {

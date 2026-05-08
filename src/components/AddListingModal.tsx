@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, MapPin, Phone, FileText, AlertCircle } from 'lucide-react';
+import { X, MapPin, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { addListing } from '../services/firestoreService';
 

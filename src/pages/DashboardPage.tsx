@@ -5,7 +5,7 @@ import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
 import { fetchListings } from '../services/firestoreService';
-import { Listing } from '../services/firestoreService';
+import type { Listing } from '../services/firestoreService';
 
 interface ListingDisplay extends Listing {
   lastUpdated: string;
