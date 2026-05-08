@@ -2,6 +2,7 @@ import { Search, Plus, User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface NavbarProps {
   onAddListing?: () => void;
@@ -11,6 +12,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const handleLogout = async () => {
     try {
@@ -22,67 +24,93 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-primary-100">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/65 backdrop-blur-xl">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="flex h-20 items-center justify-between gap-4">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary-900">DSwap</h1>
+            <Link to="/dashboard" className="text-2xl font-semibold tracking-tight text-white">
+              DSwap
+            </Link>
           </div>
 
-          <div className="flex-1 max-w-md mx-8">
+          <div className="hidden flex-1 max-w-xl md:block">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-primary-400" />
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search listings..."
-                className="w-full pl-10 pr-4 py-2 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
+                value={searchValue}
+                onChange={(event) => setSearchValue(event.target.value)}
+                className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/90 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
               />
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
-            <button
+          <div className="flex items-center space-x-3">
+            <motion.button
               onClick={onAddListing}
-              className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors flex items-center space-x-2"
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center space-x-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 px-4 py-2.5 text-sm font-medium text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)] transition"
             >
               <Plus className="h-4 w-4" />
-              <span>Add Listing</span>
-            </button>
+              <span className="hidden sm:inline">Add Listing</span>
+            </motion.button>
 
             <div className="relative">
-              <button
+              <motion.button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-8 h-8 bg-primary-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-300 transition-colors"
+                whileTap={{ scale: 0.95 }}
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-slate-100 transition hover:bg-white/10"
               >
-                <User className="h-4 w-4 text-primary-600" />
-              </button>
+                <User className="h-4 w-4" />
+              </motion.button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-primary-100 z-50">
-                  <div className="px-4 py-3 border-b border-primary-100">
-                    <p className="text-sm font-medium text-primary-900">
-                      {currentUser?.displayName || currentUser?.email || 'User'}
-                    </p>
-                    <p className="text-xs text-primary-600">{currentUser?.email}</p>
-                  </div>
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-primary-700 hover:bg-primary-50"
-                    onClick={() => setShowDropdown(false)}
+              <AnimatePresence>
+                {showDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    className="absolute right-0 mt-2 w-64 overflow-hidden rounded-2xl border border-white/15 bg-slate-900/90 shadow-[0_20px_60px_rgba(2,6,23,0.6)] backdrop-blur-2xl z-50"
                   >
-                    <User className="h-4 w-4 inline mr-2" />
-                    Profile
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
-                  >
-                    <LogOut className="h-4 w-4 inline mr-2" />
-                    Logout
-                  </button>
-                </div>
-              )}
+                    <div className="border-b border-white/10 px-4 py-3">
+                      <p className="text-sm font-medium text-slate-100">
+                        {currentUser?.displayName || currentUser?.email || 'User'}
+                      </p>
+                      <p className="text-xs text-slate-400">{currentUser?.email}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2.5 text-sm text-slate-200 transition hover:bg-white/10"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      <User className="mr-2 inline h-4 w-4" />
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2.5 text-left text-sm text-rose-300 transition hover:bg-rose-500/20"
+                    >
+                      <LogOut className="mr-2 inline h-4 w-4" />
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
+          </div>
+        </div>
+        <div className="pb-4 md:hidden">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search listings..."
+              value={searchValue}
+              onChange={(event) => setSearchValue(event.target.value)}
+              className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/90 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+            />
           </div>
         </div>
       </div>

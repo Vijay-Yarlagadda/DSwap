@@ -3,6 +3,7 @@ import { X, MapPin, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import { addListing, getUserData } from '../services/firestoreService.js';
 import { DEPARTMENTS } from '../constants/departments';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface AddListingModalProps {
   isOpen: boolean;
@@ -97,116 +98,137 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-primary-900">Add Listing</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-primary-50 rounded-lg transition-colors"
-            >
-              <X className="h-5 w-5 text-primary-600" />
-            </button>
+    <AnimatePresence>
+      <motion.div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.98 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-slate-900/85 shadow-[0_30px_70px_rgba(2,6,23,0.65)] backdrop-blur-2xl"
+        >
+          <div className="p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-semibold text-white">Add Listing</h2>
+              <button onClick={onClose} className="rounded-lg p-2 text-slate-300 transition hover:bg-white/10">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 flex items-start gap-2 rounded-xl border border-rose-300/30 bg-rose-500/10 p-3 text-sm text-rose-200"
+              >
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {[
+                <input
+                  key="name"
+                  type="text"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                  required
+                />,
+                <select
+                  key="department"
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                  required
+                >
+                  <option value="" className="text-slate-900">Select Department</option>
+                  {DEPARTMENTS.map((dept) => (
+                    <option key={dept} value={dept} className="text-slate-900">
+                      {dept}
+                    </option>
+                  ))}
+                </select>,
+                <div key="amount" className="relative">
+                  <span className="absolute left-3 top-3 font-medium text-primary-200">₹</span>
+                  <input
+                    type="number"
+                    placeholder="Amount"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-8 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    required
+                  />
+                </div>,
+                <div key="location" className="relative">
+                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary-200" />
+                  <select
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    required
+                  >
+                    <option value="" className="text-slate-900">Select Location</option>
+                    {locations.map((location) => (
+                      <option key={location} value={location} className="text-slate-900">
+                        {location}
+                      </option>
+                    ))}
+                  </select>
+                </div>,
+                <div key="phone" className="relative">
+                  <Phone className="absolute left-3 top-3 h-5 w-5 text-primary-200" />
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    required
+                  />
+                </div>,
+              ].map((field, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                >
+                  {field}
+                </motion.div>
+              ))}
+
+              <div className="flex space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isLoading}
+                  className="flex-1 rounded-xl border border-white/15 bg-white/5 py-3 font-medium text-slate-200 transition hover:bg-white/10 disabled:opacity-70"
+                >
+                  Cancel
+                </button>
+                <motion.button
+                  type="submit"
+                  disabled={isLoading}
+                  whileHover={{ scale: isLoading ? 1 : 1.01 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.99 }}
+                  className="flex-1 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 py-3 font-medium text-white shadow-[0_10px_24px_rgba(37,99,235,0.35)] transition disabled:opacity-70"
+                >
+                  {isLoading ? 'Adding...' : 'Add Listing'}
+                </motion.button>
+              </div>
+            </form>
           </div>
-
-          {error && (
-            <div className="mb-4 flex items-start gap-2 rounded-lg border border-rose-300/40 bg-rose-500/10 p-3 text-sm text-rose-700">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
-                required
-              />
-            </div>
-
-            <div className="relative">
-              <select
-                value={formData.department}
-                onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                className="w-full px-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors appearance-none"
-                required
-              >
-                <option value="">Select Department</option>
-                {DEPARTMENTS.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="relative">
-              <span className="absolute left-3 top-3 text-primary-600 font-medium">₹</span>
-              <input
-                type="number"
-                placeholder="Amount"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                className="w-full pl-8 pr-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
-                required
-              />
-            </div>
-
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary-400" />
-              <select
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors appearance-none"
-                required
-              >
-                <option value="">Select Location</option>
-                {locations.map((location) => (
-                  <option key={location} value={location}>
-                    {location}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-5 w-5 text-primary-400" />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full pl-10 pr-4 py-3 border border-primary-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"
-                required
-              />
-            </div>
-
-            <div className="flex space-x-3 pt-4">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isLoading}
-                className="flex-1 bg-primary-50 text-primary-700 py-3 rounded-lg hover:bg-primary-100 transition-colors font-medium disabled:opacity-70"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="flex-1 bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-70"
-              >
-                {isLoading ? 'Adding...' : 'Add Listing'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

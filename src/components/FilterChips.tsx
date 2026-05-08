@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+
 interface FilterChipsProps {
   filters: string[];
   activeFilter: string;
@@ -6,19 +8,21 @@ interface FilterChipsProps {
 
 const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps) => {
   return (
-    <div className="flex space-x-2 overflow-x-auto pb-2">
+    <div className="flex space-x-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {filters.map((filter) => (
-        <button
+        <motion.button
           key={filter}
           onClick={() => onFilterChange(filter)}
-          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.98 }}
+          className={`whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-medium transition-all ${
             activeFilter === filter
-              ? 'bg-primary-600 text-white'
-              : 'bg-white text-primary-700 hover:bg-primary-50 border border-primary-200'
+              ? 'border-primary-300/60 bg-primary-500/30 text-white shadow-[0_6px_18px_rgba(59,130,246,0.25)]'
+              : 'border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'
           }`}
         >
           {filter}
-        </button>
+        </motion.button>
       ))}
     </div>
   );

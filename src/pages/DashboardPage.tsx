@@ -5,6 +5,7 @@ import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
 import { getListings } from '../services/firestoreService.js';
+import { motion } from 'framer-motion';
 
 interface Listing {
   id?: string;
@@ -62,42 +63,67 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary-50">
+    <div className="relative min-h-screen overflow-hidden bg-slate-950">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(59,130,246,0.25),transparent_34%),radial-gradient(circle_at_88%_20%,rgba(56,189,248,0.22),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(30,64,175,0.2),transparent_40%)]" />
       <Navbar onAddListing={() => setIsModalOpen(true)} />
 
-      <div className="container mx-auto px-4 py-6">
-        <FilterChips
-          filters={filters}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-        />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6"
+      >
+        <motion.div
+          className="rounded-3xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl sm:p-5"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <p className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400">Browse by location</p>
+          <FilterChips filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+        </motion.div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
-              <p className="text-primary-600">Loading listings...</p>
-            </div>
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="h-52 animate-pulse rounded-3xl border border-white/10 bg-white/[0.06]" />
+            ))}
           </div>
         ) : listings.length === 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <p className="text-primary-600 text-lg">No listings available</p>
-              <p className="text-primary-400 text-sm">Add a listing to get started</p>
+          <motion.div
+            className="mt-8 flex min-h-[45vh] items-center justify-center rounded-3xl border border-white/10 bg-white/[0.05] p-8 text-center backdrop-blur-xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div>
+              <motion.div
+                className="mx-auto mb-6 h-24 w-24 rounded-full bg-primary-500/20 blur-2xl"
+                animate={{ y: [0, -8, 0], opacity: [0.7, 1, 0.7] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <h3 className="text-2xl font-semibold text-slate-100">No listings yet</h3>
+              <p className="mt-2 text-slate-400">Add your first listing to start exchanging instantly.</p>
             </div>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-6">
+          <motion.div
+            className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.06 } },
+            }}
+          >
             {listings.map((listing) => (
-              <ListingCard 
+              <ListingCard
                 key={listing.id} 
                 listing={listing}
                 onListingDeleted={handleListingAdded}
               />
             ))}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
 
       <AddListingModal 
         isOpen={isModalOpen} 
