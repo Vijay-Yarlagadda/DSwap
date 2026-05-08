@@ -23,6 +23,17 @@ const sortByLatest = (listings) =>
     return bSeconds - aSeconds;
   });
 
+const isValidListingData = (listing) => {
+  if (!listing) return false;
+
+  const amount = Number(listing.amount);
+  const location = String(listing.location ?? '').trim();
+  const name = String(listing.name ?? '').trim();
+  const phone = String(listing.phone ?? '').trim();
+
+  return Number.isFinite(amount) && location.length > 0 && name.length > 0 && phone.length > 0;
+};
+
 const formatFirestoreError = (error, fallbackMessage) => {
   if (error instanceof Error) {
     return new Error(error.message || fallbackMessage);
@@ -98,10 +109,13 @@ export const getListings = async ({ location } = {}) => {
     const listingsQuery = location ? query(listingsRef, where('location', '==', location)) : query(listingsRef);
 
     const snapshot = await getDocs(listingsQuery);
-    const listings = snapshot.docs.map((listingDoc) => ({
-      id: listingDoc.id,
-      ...listingDoc.data(),
-    }));
+    const listings = snapshot.docs
+      .map((listingDoc) => ({
+        id: listingDoc.id,
+        ...listingDoc.data(),
+      }))
+      .filter((listing) => isValidListingData(listing));
+
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load listings.');
@@ -140,10 +154,12 @@ export const fetchUserListings = async (uid) => {
     const listingsRef = collection(db, LISTINGS_COLLECTION);
     const q = query(listingsRef, where('userId', '==', uid));
     const snapshot = await getDocs(q);
-    const listings = snapshot.docs.map((listingDoc) => ({
-      id: listingDoc.id,
-      ...listingDoc.data(),
-    }));
+    const listings = snapshot.docs
+      .map((listingDoc) => ({
+        id: listingDoc.id,
+        ...listingDoc.data(),
+      }))
+      .filter((listing) => isValidListingData(listing));
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load your listings.');

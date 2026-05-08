@@ -5,7 +5,7 @@ import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
 import { getListings } from '../services/firestoreService.js';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Listing {
   id?: string;
@@ -89,21 +89,28 @@ const DashboardPage = () => {
             ))}
           </div>
         ) : listings.length === 0 ? (
-          <motion.div
-            className="mt-8 flex min-h-[45vh] items-center justify-center rounded-[2rem] border border-white/10 bg-slate-950/75 p-8 text-center backdrop-blur-2xl shadow-[0_24px_60px_rgba(2,6,23,0.5)]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div>
+          <AnimatePresence>
+            <motion.div
+              className="relative mt-8 flex min-h-[45vh] items-center justify-center rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 text-center backdrop-blur-2xl shadow-[0_24px_64px_rgba(2,6,23,0.5)]"
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -18 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
               <motion.div
-                className="mx-auto mb-6 h-24 w-24 rounded-full bg-primary-500/20 blur-2xl"
-                animate={{ y: [0, -8, 0], opacity: [0.72, 1, 0.72] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute inset-x-0 top-0 mx-auto mt-[-48px] h-24 w-24 rounded-full bg-primary-500/15 blur-3xl"
+                initial={{ opacity: 0, y: -12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
               />
-              <h3 className="text-2xl font-semibold text-slate-100">No listings yet</h3>
-              <p className="mt-2 text-slate-400">Add your first listing to start exchanging instantly.</p>
-            </div>
-          </motion.div>
+              <div className="relative max-w-xl">
+                <h3 className="text-2xl font-semibold text-slate-100">No valid listings available</h3>
+                <p className="mt-3 text-slate-400">
+                  It looks like there are no properly completed listings yet. Create a new listing to get started.
+                </p>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         ) : (
           <motion.div
             className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
