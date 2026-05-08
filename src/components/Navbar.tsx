@@ -24,16 +24,16 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
   };
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/65 backdrop-blur-xl">
+    <nav className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/80 backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex h-20 items-center justify-between gap-4">
-          <div className="flex items-center">
+        <div className="flex h-24 items-center justify-between gap-4 py-3">
+          <div className="flex items-center gap-3">
             <Link to="/dashboard" className="text-2xl font-semibold tracking-tight text-white">
               DSwap
             </Link>
           </div>
 
-          <div className="hidden flex-1 max-w-xl md:block">
+          <div className="hidden flex-1 max-w-2xl md:block">
             <div className="relative">
               <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
@@ -41,7 +41,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
                 placeholder="Search listings..."
                 value={searchValue}
                 onChange={(event) => setSearchValue(event.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/90 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                className="w-full rounded-2xl border border-white/10 bg-slate-950/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/85 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
               />
             </div>
           </div>
@@ -109,7 +109,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
               placeholder="Search listings..."
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
-              className="w-full rounded-xl border border-white/15 bg-white/5 py-2.5 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/90 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+              className="w-full rounded-2xl border border-white/10 bg-slate-950/70 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition-all duration-300 placeholder:text-slate-400/85 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.12)]"
             />
           </div>
         </div>

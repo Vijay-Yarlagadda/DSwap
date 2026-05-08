@@ -64,17 +64,17 @@ const DashboardPage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(59,130,246,0.25),transparent_34%),radial-gradient(circle_at_88%_20%,rgba(56,189,248,0.22),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(30,64,175,0.2),transparent_40%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(59,130,246,0.22),transparent_34%),radial-gradient(circle_at_88%_20%,rgba(56,189,248,0.18),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(30,64,175,0.16),transparent_40%)]" />
       <Navbar onAddListing={() => setIsModalOpen(true)} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ duration: 0.65, ease: 'easeOut' }}
         className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6"
       >
         <motion.div
-          className="rounded-3xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-xl sm:p-5"
+          className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-[0_30px_80px_rgba(3,9,23,0.45)] backdrop-blur-2xl sm:p-6"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -90,14 +90,14 @@ const DashboardPage = () => {
           </div>
         ) : listings.length === 0 ? (
           <motion.div
-            className="mt-8 flex min-h-[45vh] items-center justify-center rounded-3xl border border-white/10 bg-white/[0.05] p-8 text-center backdrop-blur-xl"
+            className="mt-8 flex min-h-[45vh] items-center justify-center rounded-[2rem] border border-white/10 bg-slate-950/75 p-8 text-center backdrop-blur-2xl shadow-[0_24px_60px_rgba(2,6,23,0.5)]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <div>
               <motion.div
                 className="mx-auto mb-6 h-24 w-24 rounded-full bg-primary-500/20 blur-2xl"
-                animate={{ y: [0, -8, 0], opacity: [0.7, 1, 0.7] }}
+                animate={{ y: [0, -8, 0], opacity: [0.72, 1, 0.72] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
               />
               <h3 className="text-2xl font-semibold text-slate-100">No listings yet</h3>

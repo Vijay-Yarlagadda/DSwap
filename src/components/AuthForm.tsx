@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
 import { signup, login, signInWithGoogle } from '../services/authService';
+import { getUserData } from '../services/firestoreService.js';
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -67,9 +68,17 @@ const AuthForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      await signInWithGoogle();
+      const user = await signInWithGoogle();
+      const profile = await getUserData(user.uid);
+
       setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 550);
+      setTimeout(() => {
+        if (!profile?.department || !profile?.phone) {
+          navigate('/complete-profile');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 550);
     } catch (error) {
       const fallbackError = 'Google sign-in failed. Please try again.';
       if (error instanceof Error) {

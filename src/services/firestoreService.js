@@ -34,12 +34,17 @@ export const saveUserData = async (uid, userData) => {
   try {
     const userRef = doc(db, USERS_COLLECTION, uid);
     const existingUser = await getDoc(userRef);
+    const existingData = existingUser.exists() ? existingUser.data() : {};
 
     const payload = {
-      name: userData.name?.trim() || '',
-      department: userData.department?.trim() || '',
-      phone: userData.phone?.trim() || '',
-      email: userData.email?.trim() || '',
+      name:
+        userData?.name?.trim() || existingData?.name?.trim() || '',
+      department:
+        userData?.department?.trim() ?? existingData?.department ?? '',
+      phone:
+        userData?.phone?.trim() ?? existingData?.phone ?? '',
+      email:
+        userData?.email?.trim() || existingData?.email?.trim() || '',
       updatedAt: serverTimestamp(),
     };
 

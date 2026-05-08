@@ -5,6 +5,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
+import CompleteProfilePage from './pages/CompleteProfilePage';
 
 function App() {
   return (
@@ -19,6 +20,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/complete-profile"
+              element={
+                <ProtectedRoute>
+                  <CompleteProfilePage />
                 </ProtectedRoute>
               }
             />

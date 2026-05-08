@@ -14,11 +14,11 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
           key={filter}
           onClick={() => onFilterChange(filter)}
           whileHover={{ y: -1 }}
-          whileTap={{ scale: 0.98 }}
-          className={`whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-medium transition-all ${
+          whileTap={{ scale: 0.985 }}
+          className={`whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
             activeFilter === filter
-              ? 'border-primary-300/60 bg-primary-500/30 text-white shadow-[0_6px_18px_rgba(59,130,246,0.25)]'
-              : 'border-white/15 bg-white/5 text-slate-200 hover:bg-white/10'
+              ? 'border-primary-300/50 bg-primary-500/25 text-white shadow-[0_18px_40px_rgba(59,130,246,0.17)]'
+              : 'border-white/10 bg-slate-900/60 text-slate-200 hover:border-white/20 hover:bg-white/10'
           }`}
         >
           {filter}
