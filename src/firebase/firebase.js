@@ -3,22 +3,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyCvmBIiaQMdmVzZqLR7VP06hONrrhFloIo',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'dswap-6d834.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'dswap-6d834',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:548215971868:web:160fa936d6e05a0eca3fd9',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '548215971868',
 };
-
-const missingConfig = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-if (missingConfig.length > 0) {
-  throw new Error(
-    `Missing Firebase config: ${missingConfig.join(', ')}. Add VITE_FIREBASE_* values to your .env file.`,
-  );
-}
 
 const app = initializeApp(firebaseConfig);
 

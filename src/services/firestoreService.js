@@ -5,7 +5,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -16,6 +15,13 @@ import { db } from '../firebase/firebase';
 
 const USERS_COLLECTION = 'users';
 const LISTINGS_COLLECTION = 'listings';
+
+const sortByLatest = (listings) =>
+  listings.sort((a, b) => {
+    const aSeconds = a?.createdAt?.seconds ?? 0;
+    const bSeconds = b?.createdAt?.seconds ?? 0;
+    return bSeconds - aSeconds;
+  });
 
 const formatFirestoreError = (error, fallbackMessage) => {
   if (error instanceof Error) {
@@ -84,15 +90,14 @@ export const addListing = async (uid, listingData) => {
 export const getListings = async ({ location } = {}) => {
   try {
     const listingsRef = collection(db, LISTINGS_COLLECTION);
-    const listingsQuery = location
-      ? query(listingsRef, where('location', '==', location), orderBy('createdAt', 'desc'))
-      : query(listingsRef, orderBy('createdAt', 'desc'));
+    const listingsQuery = location ? query(listingsRef, where('location', '==', location)) : query(listingsRef);
 
     const snapshot = await getDocs(listingsQuery);
-    return snapshot.docs.map((listingDoc) => ({
+    const listings = snapshot.docs.map((listingDoc) => ({
       id: listingDoc.id,
       ...listingDoc.data(),
     }));
+    return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load listings.');
   }
@@ -128,12 +133,13 @@ export const updateUserProfile = async (uid, updates) => {
 export const fetchUserListings = async (uid) => {
   try {
     const listingsRef = collection(db, LISTINGS_COLLECTION);
-    const q = query(listingsRef, where('userId', '==', uid), orderBy('createdAt', 'desc'));
+    const q = query(listingsRef, where('userId', '==', uid));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map((listingDoc) => ({
+    const listings = snapshot.docs.map((listingDoc) => ({
       id: listingDoc.id,
       ...listingDoc.data(),
     }));
+    return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load your listings.');
   }
