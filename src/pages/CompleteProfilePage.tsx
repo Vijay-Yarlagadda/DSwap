@@ -148,11 +148,11 @@ const CompleteProfilePage = () => {
                 <select
                   value={department}
                   onChange={(event) => setDepartment(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-200 outline-none transition focus:border-primary-300/80"
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950/80 bg-[url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 20 20\'%3E%3Cpath fill=\'rgba(148,163,184,1)\' d=\'M5.25 7.25L10 12l4.75-4.75H5.25z\'/%3E%3C/svg%3E')] bg-no-repeat bg-right-4 bg-center px-4 py-3 pr-10 text-slate-200 outline-none appearance-none transition duration-200 ease-out focus:border-primary-300/80 focus:bg-slate-950/90"
                 >
                   <option value="">Select department</option>
                   {DEPARTMENTS.map((dept) => (
-                    <option key={dept} value={dept} className="text-slate-900">
+                    <option key={dept} value={dept} className="text-slate-100 bg-slate-950">
                       {dept}
                     </option>
                   ))}
