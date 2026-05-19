@@ -110,11 +110,12 @@ const DashboardPage = () => {
         transition={{ duration: 0.65, ease: 'easeOut' }}
         className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6"
       >
-        <motion.div
+        <motion.div 
           className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-slate-900/95 to-slate-950/90 p-5 shadow-[0_30px_80px_rgba(3,9,23,0.45),0_0_40px_rgba(59,130,246,0.08)] backdrop-blur-2xl sm:p-6 transition-all duration-500"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          whileHover={{ shadow: '0_30px_80px_rgba(3,9,23,0.55),0_0_50px_rgba(59,130,246,0.12)' }}
+          transition={{ duration: 0.5, ease: 'easeOut' }}
+          whileHover={{ boxShadow: '0_30px_80px_rgba(3,9,23,0.55),0_0_50px_rgba(59,130,246,0.12)' }}
         >
           {/* Floating glow effect on hover */}
           <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-sky-500/10 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -123,7 +124,7 @@ const DashboardPage = () => {
             className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 font-medium"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 }}
+            transition={{ delay: 0.15, duration: 0.35 }}
           >
             Browse by location
           </motion.p>

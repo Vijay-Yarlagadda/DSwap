@@ -12,7 +12,7 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
       className="flex space-x-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
+      transition={{ duration: 0.45, delay: 0.1 }}
     >
       {filters.map((filter, index) => (
         <motion.button
@@ -21,8 +21,8 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
           onClick={() => onFilterChange(filter)}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-          whileHover={{ scale: 1.05, y: -2 }}
+          transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
+          whileHover={{ scale: 1.03, y: -1 }}
           whileTap={{ scale: 0.97 }}
           className={`group relative whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition duration-300 focus:outline-none focus:ring-2 focus:ring-sky-500/30 overflow-hidden ${
             activeFilter === filter
@@ -37,8 +37,8 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
           {activeFilter === filter && (
             <motion.div
               className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-500/10 via-transparent to-sky-600/10"
-              animate={{ opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 3, repeat: Infinity }}
+              animate={{ opacity: [0.25, 0.5, 0.25] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
             />
           )}
           
