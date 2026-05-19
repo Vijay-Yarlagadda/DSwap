@@ -159,14 +159,14 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-base text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 />,
                 <motion.select
                   key="department"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-base text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 >
                   <option value="" className="text-slate-900">Select Department</option>
@@ -183,7 +183,7 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                     placeholder="Amount"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-4 py-3 text-base text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,
@@ -192,7 +192,7 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   <motion.select
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-base text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   >
                     <option value="" className="text-slate-900">Select Location</option>
@@ -210,7 +210,7 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                     placeholder="Phone Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-base text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,

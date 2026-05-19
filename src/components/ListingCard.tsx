@@ -180,7 +180,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.08, duration: 0.25 }}
               >
-                <h3 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                <h3 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
               </motion.div>

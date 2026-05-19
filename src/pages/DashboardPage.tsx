@@ -124,7 +124,7 @@ const DashboardPage = () => {
         ) : listings.length === 0 ? (
           <AnimatePresence>
             <motion.div
-              className="relative mt-8 flex min-h-[45vh] items-center justify-center overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-slate-950/90 p-8 text-center backdrop-blur-2xl shadow-[0_16px_64px_rgba(3,12,39,0.3),0_24px_80px_rgba(6,15,41,0.2)]"
+              className="relative mt-8 flex min-h-[45vh] items-center justify-center overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-br from-slate-900/90 via-slate-950/85 to-slate-950/90 p-6 sm:p-8 text-center backdrop-blur-2xl shadow-[0_16px_64px_rgba(3,12,39,0.3),0_24px_80px_rgba(6,15,41,0.2)]"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -18 }}
