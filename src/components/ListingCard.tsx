@@ -138,7 +138,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
         className="pointer-events-none absolute -bottom-12 -right-12 h-32 w-32 rounded-full bg-indigo-600/10 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
 
-      <div className="relative z-10 flex justify-between items-start mb-4">
+      <div className="relative z-50 flex justify-between items-start mb-4">
         <div className="flex-1">
           {isEditing ? (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
@@ -217,7 +217,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 12, scale: 0.94 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute right-0 top-14 z-50 w-56 overflow-hidden rounded-3xl border border-white/15 bg-slate-950/95 shadow-[0_24px_80px_rgba(2,6,23,0.65)] backdrop-blur-3xl"
+                  className="absolute right-0 top-14 z-50 w-56 overflow-hidden rounded-3xl border border-white/15 bg-slate-950/95 shadow-[0_24px_80px_rgba(2,6,23,0.65)] backdrop-blur-3xl pointer-events-auto"
                 >
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
                   <div className="py-1 space-y-0.5">
@@ -241,10 +241,10 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                         handleComplete();
                       }}
                       disabled={isCompleting}
-                      whileHover={!isCompleting ? { x: 4, backgroundColor: 'rgba(16,185,129,0.15)' } : {}}
+                      whileHover={!isCompleting ? { x: 4 } : {}}
                       whileTap={!isCompleting ? { scale: 0.98 } : {}}
                       transition={{ duration: 0.15 }}
-                      className="flex w-full items-center px-4 py-3 text-sm font-medium text-emerald-200 transition duration-150 disabled:opacity-50 hover:text-emerald-100 cursor-pointer"
+                      className="flex w-full items-center px-4 py-3 text-sm font-medium text-emerald-200 transition duration-150 disabled:opacity-50 hover:text-emerald-100 hover:bg-emerald-500/15 cursor-pointer"
                     >
                       <CheckCircle className="mr-3 h-4 w-4 text-emerald-400" />
                       {isCompleting ? 'Completing...' : 'DSwap Done'}
@@ -256,10 +256,10 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                         handleDelete();
                       }}
                       disabled={isDeleting}
-                      whileHover={!isDeleting ? { x: 4, backgroundColor: 'rgba(239,68,68,0.15)' } : {}}
+                      whileHover={!isDeleting ? { x: 4 } : {}}
                       whileTap={!isDeleting ? { scale: 0.98 } : {}}
                       transition={{ duration: 0.15 }}
-                      className="flex w-full items-center px-4 py-3 text-sm font-medium text-rose-200 transition duration-150 disabled:opacity-50 hover:text-rose-100 cursor-pointer"
+                      className="flex w-full items-center px-4 py-3 text-sm font-medium text-rose-200 transition duration-150 disabled:opacity-50 hover:text-rose-100 hover:bg-rose-500/15 cursor-pointer"
                     >
                       <Trash2 className="mr-3 h-4 w-4 text-rose-300" />
                       Delete
