@@ -1,4 +1,4 @@
-﻿import { Search, Plus, User, LogOut } from 'lucide-react';
+import { Plus, User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
@@ -13,7 +13,6 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [showDropdown, setShowDropdown] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
   const [profileName, setProfileName] = useState<string>('');
 
   useEffect(() => {
@@ -74,24 +73,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
             </Link>
           </motion.div>
 
-          <motion.div
-            className="hidden flex-1 max-w-2xl md:block"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.1 }}
-          >
-            <div className="group relative">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-sky-400" />
-              <input
-                type="text"
-                placeholder="Search listings..."
-                value={searchValue}
-                onChange={(event) => setSearchValue(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition duration-300 placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-slate-900/85 focus:ring-2 focus:ring-sky-500/20"
-              />
-              <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
-            </div>
-          </motion.div>
+
 
           <motion.div
             className="flex items-center gap-3"
@@ -172,19 +154,6 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
               </AnimatePresence>
             </div>
           </motion.div>
-        </div>
-        <div className="pb-4 md:hidden">
-          <div className="group relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 transition-colors duration-300 group-focus-within:text-sky-400" />
-            <input
-              type="text"
-              placeholder="Search listings..."
-              value={searchValue}
-              onChange={(event) => setSearchValue(event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-slate-900/60 py-3 pl-11 pr-4 text-sm text-slate-100 outline-none transition duration-300 placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-slate-900/85 focus:ring-2 focus:ring-sky-500/20"
-            />
-            <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
-          </div>
         </div>
       </div>
     </nav>
