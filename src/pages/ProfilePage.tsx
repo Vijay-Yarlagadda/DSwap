@@ -116,66 +116,75 @@ const ProfilePage = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(59,130,246,0.25),transparent_34%),radial-gradient(circle_at_85%_22%,rgba(56,189,248,0.2),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(37,99,235,0.2),transparent_42%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_10%,rgba(15,23,42,0.95),transparent_24%),radial-gradient(circle_at_86%_20%,rgba(15,23,42,0.92),transparent_32%)]" />
       <motion.div
         className="relative z-10 mx-auto max-w-7xl px-4 py-8 sm:px-6"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: 'easeOut' }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
       >
-        <div className="mb-6">
-          <Link to="/dashboard" className="inline-flex items-center text-slate-300 hover:text-white transition-colors">
-            <ArrowLeft className="h-4 w-4 mr-2" />
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Profile</p>
+            <h1 className="mt-2 text-4xl font-semibold text-white">Your DSwap dashboard</h1>
+            <p className="mt-2 max-w-2xl text-slate-400">Manage your account details, active listings, and completed exchanges from a refined and professional profile view.</p>
+          </div>
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/85 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-900"
+          >
+            <ArrowLeft className="h-4 w-4" />
             Back to Dashboard
           </Link>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          {error && (
-            <div className="mb-6 flex items-start gap-2 rounded-xl border border-rose-300/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+        {error && (
+          <div className="mb-6 rounded-3xl border border-rose-400/20 bg-rose-500/10 p-4 text-sm text-rose-200 shadow-sm">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-4 w-4 text-rose-300" />
               <span>{error}</span>
             </div>
-          )}
+          </div>
+        )}
 
-          <div className="mb-8 rounded-3xl border border-white/10 bg-white/[0.06] p-8 shadow-[0_20px_50px_rgba(2,6,23,0.5)] backdrop-blur-xl">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+        <div className="grid gap-6 xl:grid-cols-[1.6fr_0.9fr]">
+          <div className="rounded-[2rem] border border-slate-800/80 bg-slate-900/90 p-8 shadow-premium-xl">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <h1 className="text-3xl font-semibold text-white">Profile</h1>
-                <p className="text-sm text-slate-400">Manage your account details and logout securely.</p>
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Account overview</p>
+                <h2 className="mt-3 text-3xl font-semibold text-white">Your profile details</h2>
               </div>
-
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 <button
                   onClick={handleLogout}
-                  className="bg-rose-500/90 text-white px-4 py-2 rounded-xl hover:bg-rose-500 transition-colors flex items-center space-x-2"
+                  className="inline-flex items-center gap-2 rounded-2xl bg-rose-500/85 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-500"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
+                  Logout
                 </button>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="bg-primary-600 text-white px-4 py-2 rounded-xl hover:bg-primary-500 transition-colors flex items-center space-x-2"
+                    className="inline-flex items-center gap-2 rounded-2xl bg-sky-500/90 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
                   >
                     <Edit className="h-4 w-4" />
-                    <span>Edit</span>
+                    Edit
                   </button>
                 ) : (
-                  <div className="flex space-x-2">
+                  <div className="flex flex-wrap gap-3">
                     <button
                       onClick={handleCancel}
                       disabled={isSaving}
-                      className="border border-white/20 bg-white/5 text-slate-200 px-4 py-2 rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50"
+                      className="rounded-2xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:bg-slate-900 disabled:opacity-50"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={isSaving}
-                      className="bg-primary-600 text-white px-4 py-2 rounded-xl hover:bg-primary-500 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                      className="rounded-2xl bg-sky-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-400 disabled:opacity-50"
                     >
-                      <span>{isSaving ? 'Saving...' : 'Save'}</span>
+                      {isSaving ? 'Saving...' : 'Save'}
                     </button>
                   </div>
                 )}
@@ -183,126 +192,163 @@ const ProfilePage = () => {
             </div>
 
             {profile && editedProfile && (
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-primary-500/20 rounded-full flex items-center justify-center border border-primary-300/40">
-                    <User className="h-8 w-8 text-primary-200" />
+              <div className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-[1.75rem] border border-slate-800/70 bg-slate-950/80 p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-800 text-slate-100">
+                      <User className="h-8 w-8" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">Account holder</p>
+                      <p className="mt-1 text-xl font-semibold text-white">{profile.name}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editedProfile.name}
-                        onChange={(e) => setEditedProfile({ ...editedProfile, name: e.target.value })}
-                        className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-primary-300/70 focus:bg-white/10"
-                        placeholder="Full Name"
-                      />
-                    ) : (
-                      <h2 className="text-2xl font-semibold text-white">{profile.name}</h2>
-                    )}
+
+                  <div className="mt-8 space-y-5">
+                    <div className="rounded-3xl border border-slate-800/60 bg-slate-900/80 p-4">
+                      <label className="flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                        <Mail className="h-4 w-4 text-slate-400" />
+                        Email
+                      </label>
+                      <p className="mt-2 text-base text-slate-200">{profile.email}</p>
+                    </div>
+                    <div className="rounded-3xl border border-slate-800/60 bg-slate-900/80 p-4">
+                      <label className="flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                        <Phone className="h-4 w-4 text-slate-400" />
+                        Phone
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="tel"
+                          value={editedProfile.phone}
+                          onChange={(e) => setEditedProfile({ ...editedProfile, phone: e.target.value })}
+                          className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-slate-400/60 focus:bg-slate-950/90"
+                          placeholder="Phone number"
+                        />
+                      ) : (
+                        <p className="mt-2 text-base text-slate-200">{profile.phone}</p>
+                      )}
+                    </div>
+                    <div className="rounded-3xl border border-slate-800/60 bg-slate-900/80 p-4">
+                      <label className="flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                        <Building className="h-4 w-4 text-slate-400" />
+                        Department
+                      </label>
+                      {isEditing ? (
+                        <select
+                          value={editedProfile.department}
+                          onChange={(e) => setEditedProfile({ ...editedProfile, department: e.target.value })}
+                          className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-slate-400/60 focus:bg-slate-950/90"
+                        >
+                          <option value="" className="text-slate-900">Select Department</option>
+                          {DEPARTMENTS.map((department) => (
+                            <option key={department} value={department} className="text-slate-900">
+                              {department}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p className="mt-2 text-base text-slate-200">{profile.department}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="flex items-center text-slate-300 font-medium">
-                      <Mail className="h-4 w-4 mr-2" />
-                      Email
-                    </label>
-                    <p className="px-3 py-2 text-slate-200">{profile.email}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="flex items-center text-slate-300 font-medium">
-                      <Phone className="h-4 w-4 mr-2" />
-                      Phone Number
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="tel"
-                        value={editedProfile.phone}
-                        onChange={(e) => setEditedProfile({ ...editedProfile, phone: e.target.value })}
-                        className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-primary-300/70 focus:bg-white/10"
-                        placeholder="Phone Number"
-                      />
-                    ) : (
-                      <p className="px-3 py-2 text-slate-200">{profile.phone}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="flex items-center text-slate-300 font-medium">
-                      <Building className="h-4 w-4 mr-2" />
-                      Department
-                    </label>
-                    {isEditing ? (
-                      <select
-                        value={editedProfile.department}
-                        onChange={(e) => setEditedProfile({ ...editedProfile, department: e.target.value })}
-                        className="w-full rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-slate-100 outline-none transition focus:border-primary-300/70 focus:bg-white/10"
-                      >
-                        <option value="" className="text-slate-900">Select Department</option>
-                        {DEPARTMENTS.map((department) => (
-                          <option key={department} value={department} className="text-slate-900">
-                            {department}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <p className="px-3 py-2 text-slate-200">{profile.department}</p>
-                    )}
+                <div className="rounded-[1.75rem] border border-slate-800/70 bg-slate-950/80 p-6">
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Profile information</p>
+                  <p className="mt-4 text-slate-400">Update your details to keep your account current. This section remains streamlined and professional while giving you control over contact data.</p>
+                  <div className="mt-6 space-y-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Name</p>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editedProfile.name}
+                          onChange={(e) => setEditedProfile({ ...editedProfile, name: e.target.value })}
+                          className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-950/80 px-4 py-3 text-slate-100 outline-none transition focus:border-slate-400/60 focus:bg-slate-950/90"
+                          placeholder="Full name"
+                        />
+                      ) : (
+                        <p className="mt-1 text-base text-slate-200">{profile.name}</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Account email</p>
+                      <p className="mt-1 text-base text-slate-200">{profile.email}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">{totalListings}</div>
-              <div className="text-slate-400">Active Listings</div>
-            </motion.div>
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">{completedListings}</div>
-              <div className="text-slate-400">Completed Exchanges</div>
-            </motion.div>
-            <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">{totalListings + completedListings}</div>
-              <div className="text-slate-400">Total Exchanges</div>
-            </motion.div>
-          </div>
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-[2rem] border border-slate-800/80 bg-slate-900/90 p-8 shadow-premium-xl">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Performance</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">Exchange stats</h2>
+                </div>
+                <div className="rounded-2xl bg-slate-800/80 px-3 py-2 text-xs uppercase tracking-[0.25em] text-slate-300">Live</div>
+              </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-xl">
-            <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
-            <div className="space-y-4">
-              {totalListings === 0 && completedListings === 0 ? (
-                <p className="text-slate-300 text-center py-8">No listings yet. Create your first listing!</p>
-              ) : (
-                <>
-                  {totalListings > 0 && (
-                    <div className="flex items-center justify-between py-3 border-b border-white/10">
-                      <div className="flex items-center space-x-3">
-                        <Package className="h-5 w-5 text-sky-400" />
-                        <div>
-                          <p className="font-medium text-slate-100">Active listings</p>
-                          <p className="text-sm text-slate-300">You have {totalListings} listing{totalListings !== 1 ? 's' : ''} available</p>
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                <div className="rounded-3xl border border-slate-800/70 bg-slate-950/80 p-5">
+                  <p className="text-sm text-slate-400">Active listings</p>
+                  <p className="mt-3 text-3xl font-semibold text-white">{totalListings}</p>
+                </div>
+                <div className="rounded-3xl border border-slate-800/70 bg-slate-950/80 p-5">
+                  <p className="text-sm text-slate-400">Completed exchanges</p>
+                  <p className="mt-3 text-3xl font-semibold text-white">{completedListings}</p>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-3xl border border-slate-800/70 bg-slate-950/80 p-6">
+                <p className="text-sm text-slate-400">Total exchange volume</p>
+                <p className="mt-2 text-4xl font-bold text-white">{totalListings + completedListings}</p>
+                <p className="mt-3 text-slate-400">A clear count of your active and completed listings.</p>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-800/80 bg-slate-900/90 p-8 shadow-premium-xl">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Recent activity</p>
+                  <h2 className="mt-2 text-2xl font-semibold text-white">Latest updates</h2>
+                </div>
+                <CheckCircle className="h-5 w-5 text-emerald-400" />
+              </div>
+
+              <div className="mt-8 space-y-4">
+                {totalListings === 0 && completedListings === 0 ? (
+                  <div className="rounded-3xl border border-slate-800/70 bg-slate-950/80 p-6 text-slate-300">No active or completed listings yet. Start by adding a listing.</div>
+                ) : (
+                  <>
+                    {totalListings > 0 && (
+                      <div className="rounded-3xl border border-slate-800/70 bg-slate-950/80 p-5">
+                        <div className="flex items-center gap-3">
+                          <Package className="h-5 w-5 text-sky-400" />
+                          <div>
+                            <p className="font-medium text-white">Active listings</p>
+                            <p className="text-sm text-slate-400">{totalListings} currently available.</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                  {completedListings > 0 && (
-                    <div className="flex items-center justify-between py-3 border-b border-white/10">
-                      <div className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-emerald-400" />
-                        <div>
-                          <p className="font-medium text-slate-100">Completed exchanges</p>
-                          <p className="text-sm text-slate-300">You have completed {completedListings} exchange{completedListings !== 1 ? 's' : ''}</p>
+                    )}
+                    {completedListings > 0 && (
+                      <div className="rounded-3xl border border-slate-800/70 bg-slate-950/80 p-5">
+                        <div className="flex items-center gap-3">
+                          <CheckCircle className="h-5 w-5 text-emerald-400" />
+                          <div>
+                            <p className="font-medium text-white">Completed exchanges</p>
+                            <p className="text-sm text-slate-400">{completedListings} finished successfully.</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </>
-              )}
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

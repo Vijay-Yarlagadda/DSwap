@@ -117,12 +117,15 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
                 whileHover={{ scale: 1.05 }}
                 className="flex items-center gap-3 rounded-full border border-white/10 bg-slate-900/70 px-3 py-2 text-slate-100 shadow-[0_12px_28px_rgba(14,165,233,0.14)] transition duration-300 hover:border-sky-400/30 hover:bg-slate-900/85"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/70 text-sm font-semibold text-sky-300 ring-1 ring-white/10">
+                <motion.div 
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-950/70 text-sm font-semibold text-sky-300 ring-1 ring-white/10"
+                  whileHover={{ scale: 1.08 }}
+                  transition={{ duration: 0.2 }}
+                >
                   {initials || 'U'}
-                </div>
+                </motion.div>
                 <div className="hidden min-w-0 flex-col truncate md:flex">
                   <span className="truncate text-sm font-medium text-white">{displayName}</span>
-                  <span className="truncate text-xs text-slate-500">Account</span>
                 </div>
               </motion.button>
 

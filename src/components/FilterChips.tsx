@@ -9,10 +9,10 @@ interface FilterChipsProps {
 const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps) => {
   return (
     <motion.div
-      className="flex space-x-3 overflow-x-auto pb-3 pr-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative"
-      initial={{ opacity: 0, y: 12 }}
+      className="flex flex-wrap gap-4 py-2"
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, delay: 0.1 }}
+      transition={{ duration: 0.4, delay: 0.08 }}
     >
       {filters.map((filter, index) => {
         const isActive = activeFilter === filter;
@@ -22,32 +22,26 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
             key={filter}
             type="button"
             onClick={() => onFilterChange(filter)}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.35, ease: 'easeOut' }}
-            whileHover={{ y: -2, scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`group relative whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition duration-300 focus:outline-none focus:ring-2 focus:ring-sky-400/35 focus:ring-offset-2 focus:ring-offset-slate-950 ${isActive ? 'text-white' : 'text-slate-300'}`}
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.04, duration: 0.16, ease: 'easeOut' }}
+            whileHover={{ scale: 1.08, transition: { duration: 0.1, ease: 'easeOut' } }}
+            whileTap={{ scale: 0.96, transition: { duration: 0.08, ease: 'easeOut' } }}
+            className={`relative px-2 py-1.5 rounded-full text-base font-semibold transition-all duration-150 ${
+              isActive ? 'text-sky-300' : 'text-slate-300 hover:text-slate-100'
+            }`}
           >
-            <span className="absolute inset-0 rounded-full bg-slate-900/70 shadow-[0_18px_40px_rgba(14,165,233,0.12)]" />
             {isActive && (
               <motion.span
-                layoutId="activeFilter"
-                className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-500/80 via-blue-500/80 to-cyan-400/70"
-                transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                layoutId="activeFilterUnderline"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: '100%', opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                className="absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-sky-500 to-blue-500"
+                transition={{ duration: 0.3, ease: 'easeOut' }}
               />
             )}
-            {isActive && (
-              <motion.span
-                className="absolute inset-0 rounded-full bg-white/10"
-                animate={{ opacity: [0.6, 0.85, 0.6] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-              />
-            )}
-            <span className="relative z-10 flex items-center gap-2 px-1">
-              <span className={`${isActive ? 'block' : 'hidden'} h-2.5 w-2.5 rounded-full bg-sky-300/90 shadow-[0_0_18px_rgba(56,189,248,0.25)]`} />
-              <span>{filter}</span>
-            </span>
+            <span>{filter}</span>
           </motion.button>
         );
       })}
