@@ -128,7 +128,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
+          </div>
         </div>
         <div className="pb-4 md:hidden">
           <div className="group relative">

@@ -100,56 +100,73 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-md"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-xl"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        onClick={onClose}
       >
         <motion.div
-          initial={{ opacity: 0, y: 24, scale: 0.98 }}
+          initial={{ opacity: 0, y: 24, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 24, scale: 0.98 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-slate-900/85 shadow-[0_30px_70px_rgba(2,6,23,0.65)] backdrop-blur-2xl"
+          exit={{ opacity: 0, y: 24, scale: 0.95 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950/95 shadow-[0_24px_96px_rgba(3,12,39,0.5),0_8px_32px_rgba(59,130,246,0.1)] backdrop-blur-2xl"
         >
-          <div className="p-6">
-            <div className="mb-6 flex items-center justify-between">
+          {/* Top border glow */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
+          <div className="p-6 sm:p-8">
+            <motion.div 
+              className="mb-6 flex items-center justify-between"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
               <div>
-                <h2 className="text-2xl font-semibold text-white">Add Listing</h2>
-                <p className="text-sm text-slate-400">Create a new exchange with premium campus style.</p>
+                <h2 className="text-2xl font-bold tracking-tight text-white">Add Listing</h2>
+                <p className="text-sm text-slate-400 mt-1">Create a new exchange with DSwap.</p>
               </div>
-              <button onClick={onClose} className="rounded-xl p-2 text-slate-300 transition hover:bg-white/10">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-4 flex items-start gap-2 rounded-xl border border-rose-300/30 bg-rose-500/10 p-3 text-sm text-rose-200"
+              <motion.button 
+                onClick={onClose} 
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+                className="rounded-xl p-2 text-slate-400 transition hover:bg-white/10 hover:text-slate-200"
               >
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                <span>{error}</span>
-              </motion.div>
-            )}
+                <X className="h-5 w-5" />
+              </motion.button>
+            </motion.div>
+
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  className="mb-4 flex items-start gap-2 rounded-xl border border-rose-400/30 bg-gradient-to-r from-rose-500/10 to-rose-600/5 p-3 text-sm text-rose-200 backdrop-blur-sm"
+                >
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {[
-                <input
+                <motion.input
                   key="name"
                   type="text"
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 />,
-                <select
+                <motion.select
                   key="department"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm px-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 >
                   <option value="" className="text-slate-900">Select Department</option>
@@ -158,24 +175,24 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                       {dept}
                     </option>
                   ))}
-                </select>,
+                </motion.select>,
                 <div key="amount" className="relative">
-                  <span className="absolute left-3 top-3 font-medium text-primary-200">₹</span>
-                  <input
+                  <span className="absolute left-4 top-3.5 font-bold bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent text-lg">₹</span>
+                  <motion.input
                     type="number"
                     placeholder="Amount"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-8 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm pl-9 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,
                 <div key="location" className="relative">
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-primary-200" />
-                  <select
+                  <MapPin className="absolute left-4 top-3.5 h-4 w-4 text-sky-400" />
+                  <motion.select
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm pl-11 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   >
                     <option value="" className="text-slate-900">Select Location</option>
@@ -184,16 +201,16 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                         {location}
                       </option>
                     ))}
-                  </select>
+                  </motion.select>
                 </div>,
                 <div key="phone" className="relative">
-                  <Phone className="absolute left-3 top-3 h-5 w-5 text-primary-200" />
-                  <input
+                  <Phone className="absolute left-4 top-3.5 h-4 w-4 text-sky-400" />
+                  <motion.input
                     type="tel"
                     placeholder="Phone Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-10 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-primary-300/70 focus:bg-white/10 focus:shadow-[0_0_0_4px_rgba(59,130,246,0.15)]"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm pl-11 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,
@@ -202,29 +219,33 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.04 }}
+                  transition={{ delay: index * 0.05 }}
                 >
                   {field}
                 </motion.div>
               ))}
 
-              <div className="flex space-x-3 pt-4">
-                <button
+              <div className="flex space-x-3 pt-6">
+                <motion.button
                   type="button"
                   onClick={onClose}
                   disabled={isLoading}
-                  className="flex-1 rounded-xl border border-white/15 bg-slate-900/70 py-3 font-medium text-slate-200 transition hover:bg-slate-800/80 disabled:opacity-70"
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex-1 rounded-xl border border-white/15 bg-slate-900/50 backdrop-blur-sm py-3 font-semibold text-slate-200 transition duration-200 hover:bg-slate-800/70 hover:border-white/25 disabled:opacity-50"
                 >
                   Cancel
-                </button>
+                </motion.button>
                 <motion.button
                   type="submit"
                   disabled={isLoading}
-                  whileHover={{ scale: isLoading ? 1 : 1.02, y: isLoading ? 0 : -1 }}
-                  whileTap={{ scale: isLoading ? 1 : 0.98 }}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 py-3 font-semibold text-white shadow-[0_18px_50px_rgba(59,130,246,0.28)] transition duration-200 disabled:opacity-70 hover:shadow-[0_20px_65px_rgba(59,130,246,0.32)]"
+                  whileHover={{ scale: isLoading ? 1 : 1.04, y: isLoading ? 0 : -2 }}
+                  whileTap={{ scale: isLoading ? 1 : 0.96 }}
+                  className="relative flex-1 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-500 py-3 font-semibold text-white shadow-[0_12px_48px_rgba(59,130,246,0.3)] transition duration-300 disabled:opacity-50 overflow-hidden group"
                 >
-                  {isLoading ? 'Adding...' : 'Add Listing'}
+                  {/* Glow effect on hover */}
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-400/0 via-sky-400/20 to-indigo-400/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  <span className="relative">{isLoading ? 'Adding...' : 'Add Listing'}</span>
                 </motion.button>
               </div>
             </form>
