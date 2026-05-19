@@ -10,6 +10,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  onSnapshot
 } from 'firebase/firestore';
 import { db } from '../firebase/firebase';
 
@@ -92,6 +93,7 @@ export const addListing = async (uid, listingData) => {
       department: listingData.department?.trim(),
       phone: listingData.phone?.trim(),
       userId: uid,
+      status: 'active',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -114,12 +116,61 @@ export const getListings = async ({ location } = {}) => {
         id: listingDoc.id,
         ...listingDoc.data(),
       }))
-      .filter((listing) => isValidListingData(listing) && !listing.completed);
+      .filter((listing) => isValidListingData(listing) && listing.status !== 'completed' && !listing.completed);
 
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load listings.');
   }
+};
+
+// Real-time subscriptions
+export const subscribeToActiveListings = (location, callback) => {
+  const listingsRef = collection(db, LISTINGS_COLLECTION);
+  const listingsQuery = location 
+    ? query(listingsRef, where('location', '==', location)) 
+    : query(listingsRef);
+    
+  return onSnapshot(listingsQuery, (snapshot) => {
+    const listings = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((listing) => isValidListingData(listing) && listing.status !== 'completed' && !listing.completed);
+      
+    callback(sortByLatest(listings));
+  }, (error) => {
+    console.error('Error in listings subscription:', error);
+  });
+};
+
+export const subscribeToUserListings = (uid, callback) => {
+  const listingsRef = collection(db, LISTINGS_COLLECTION);
+  const listingsQuery = query(listingsRef, where('userId', '==', uid));
+    
+  return onSnapshot(listingsQuery, (snapshot) => {
+    const listings = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((listing) => isValidListingData(listing) && listing.status !== 'completed' && !listing.completed);
+      
+    callback(sortByLatest(listings));
+  }, (error) => {
+    console.error('Error in user listings subscription:', error);
+  });
+};
+
+export const subscribeToCompletedListings = (uid, callback) => {
+  const listingsRef = collection(db, LISTINGS_COLLECTION);
+  // Support both new `status: 'completed'` and legacy `completed: true`
+  const listingsQuery = query(listingsRef, where('userId', '==', uid));
+    
+  return onSnapshot(listingsQuery, (snapshot) => {
+    const listings = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((listing) => isValidListingData(listing) && (listing.status === 'completed' || listing.completed === true));
+      
+    callback(sortByLatest(listings));
+  }, (error) => {
+    console.error('Error in completed listings subscription:', error);
+  });
 };
 
 export const updateListingAmount = async (listingId, amount) => {
@@ -138,7 +189,8 @@ export const completeListing = async (listingId) => {
   try {
     const listingRef = doc(db, LISTINGS_COLLECTION, listingId);
     await updateDoc(listingRef, {
-      completed: true,
+      status: 'completed',
+      completed: true, // For legacy support if needed elsewhere
       completedAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -172,7 +224,7 @@ export const fetchUserListings = async (uid) => {
         id: listingDoc.id,
         ...listingDoc.data(),
       }))
-      .filter((listing) => isValidListingData(listing) && !listing.completed);
+      .filter((listing) => isValidListingData(listing) && listing.status !== 'completed' && !listing.completed);
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load your listings.');
@@ -182,14 +234,14 @@ export const fetchUserListings = async (uid) => {
 export const fetchCompletedListings = async (uid) => {
   try {
     const listingsRef = collection(db, LISTINGS_COLLECTION);
-    const q = query(listingsRef, where('userId', '==', uid), where('completed', '==', true));
+    const q = query(listingsRef, where('userId', '==', uid));
     const snapshot = await getDocs(q);
     const listings = snapshot.docs
       .map((listingDoc) => ({
         id: listingDoc.id,
         ...listingDoc.data(),
       }))
-      .filter((listing) => isValidListingData(listing));
+      .filter((listing) => isValidListingData(listing) && (listing.status === 'completed' || listing.completed === true));
     return sortByLatest(listings);
   } catch (error) {
     throw formatFirestoreError(error, 'Failed to load completed listings.');

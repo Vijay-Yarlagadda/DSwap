@@ -3,7 +3,7 @@ import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle,
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
-import { getUserData, updateUserProfile, fetchUserListings, fetchCompletedListings } from '../services/firestoreService.js';
+import { getUserData, updateUserProfile, subscribeToUserListings, subscribeToCompletedListings } from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
 
 interface UserProfile {
@@ -27,6 +27,20 @@ const ProfilePage = () => {
 
   useEffect(() => {
     loadUserProfile();
+    
+    if (currentUser) {
+      const unsubscribeActive = subscribeToUserListings(currentUser.uid, (listings) => {
+        setTotalListings(listings.length);
+      });
+      const unsubscribeCompleted = subscribeToCompletedListings(currentUser.uid, (listings) => {
+        setCompletedListings(listings.length);
+      });
+      
+      return () => {
+        unsubscribeActive();
+        unsubscribeCompleted();
+      };
+    }
   }, [currentUser]);
 
   const loadUserProfile = async () => {
@@ -40,14 +54,6 @@ const ProfilePage = () => {
       const userDetails = await getUserData(currentUser.uid);
       setProfile(userDetails);
       setEditedProfile(userDetails);
-
-      // Fetch user's listings
-      const listings = await fetchUserListings(currentUser.uid);
-      setTotalListings(listings.length);
-
-      // Fetch completed listings
-      const completed = await fetchCompletedListings(currentUser.uid);
-      setCompletedListings(completed.length);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load profile';
       setError(errorMessage);

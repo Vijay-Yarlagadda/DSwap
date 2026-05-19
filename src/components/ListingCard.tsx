@@ -120,8 +120,10 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
       whileHover={{ y: -6, scale: 1.015 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
       className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-6 shadow-[0_18px_50px_rgba(3,12,39,0.28),0_24px_80px_rgba(14,165,233,0.15)] ring-1 ring-white/10 backdrop-blur-xl transition-all duration-300"

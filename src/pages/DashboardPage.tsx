@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import FilterChips from '../components/FilterChips';
 import ListingCard from '../components/ListingCard';
@@ -33,11 +33,7 @@ const DashboardPage = () => {
 
   const filters = ['All', 'Block A', 'Block B', 'Block C', 'Library', 'Lakeview', 'Cuisine'];
 
-  useEffect(() => {
-    loadListings();
-  }, [currentUser, activeFilter]);
-
-  const loadListings = async () => {
+  const loadListings = useCallback(async () => {
     try {
       setIsLoading(true);
       const firestoreListings = await getListings({
@@ -56,11 +52,12 @@ const DashboardPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeFilter, currentUser?.uid]);
 
-  const handleListingAdded = () => {
+  useEffect(() => {
     loadListings();
-  };
+  }, [loadListings]);
+
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -87,38 +84,7 @@ const DashboardPage = () => {
         transition={{ duration: 0.7, ease: 'easeOut' }}
         className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
       >
-        <motion.section
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.05 }}
-          className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 shadow-[0_30px_90px_rgba(3,9,23,0.4)] backdrop-blur-2xl sm:p-8"
-        >
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-            <div className="space-y-4">
-              <p className="text-sm uppercase tracking-[0.3em] text-slate-400 font-semibold">DSwap Dashboard</p>
-              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Discover premium exchange opportunities in your community.
-              </h1>
-              <p className="max-w-2xl text-slate-400 sm:text-base">
-                Browse real-time listings, filter by location, and manage your offers from a cinematic, fintech-inspired dashboard.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Active</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{listings.length}</p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Location</p>
-                <p className="mt-2 text-2xl font-semibold text-white">{activeFilter}</p>
-              </div>
-              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Updated</p>
-                <p className="mt-2 text-2xl font-semibold text-white">Live feed</p>
-              </div>
-            </div>
-          </div>
-        </motion.section>
+
 
         <motion.div
           className="group relative overflow-visible rounded-[2rem] border border-white/10 bg-gradient-to-b from-slate-900/95 via-slate-950/85 to-slate-950/95 p-5 shadow-[0_30px_90px_rgba(3,9,23,0.45),0_0_40px_rgba(59,130,246,0.08)] backdrop-blur-2xl sm:p-6"
@@ -209,15 +175,17 @@ const DashboardPage = () => {
               show: { transition: { staggerChildren: 0.06 } },
             }}
           >
-            {listings.map((listing) => (
-              <ListingCard
-                key={listing.id} 
-                listing={listing}
-                onListingDeleted={handleListingAdded}
-                onListingCompleted={handleListingAdded}
-                onListingEdited={handleListingAdded}
-              />
-            ))}
+            <AnimatePresence>
+              {listings.map((listing) => (
+                <ListingCard
+                  key={listing.id} 
+                  listing={listing}
+                  onListingDeleted={loadListings}
+                  onListingCompleted={loadListings}
+                  onListingEdited={loadListings}
+                />
+              ))}
+            </AnimatePresence>
           </motion.div>
         )}
       </motion.div>
@@ -225,7 +193,7 @@ const DashboardPage = () => {
       <AddListingModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
-        onListingAdded={handleListingAdded}
+        onListingAdded={loadListings}
       />
     </div>
   );

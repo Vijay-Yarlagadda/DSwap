@@ -159,14 +159,14 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   placeholder="Full Name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                  className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 />,
                 <motion.select
                   key="department"
                   value={formData.department}
                   onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 backdrop-blur-sm px-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
+                  className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                   required
                 >
                   <option value="" className="text-slate-900">Select Department</option>
@@ -177,22 +177,22 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   ))}
                 </motion.select>,
                 <div key="amount" className="relative">
-                  <span className="absolute left-4 top-3 font-bold bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent text-2xl">₹</span>
+                  <span className="absolute left-4 top-3 text-slate-400 font-semibold text-lg">₹</span>
                   <motion.input
                     type="number"
                     placeholder="Amount"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950/60 backdrop-blur-sm pl-11 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-slate-400/60 focus:bg-slate-950/80 focus:ring-2 focus:ring-slate-500/15 hover:border-slate-600"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,
                 <div key="location" className="relative">
-                  <MapPin className="absolute left-4 top-3 h-5 w-5 text-slate-400" strokeWidth={1.5} />
+                  <MapPin className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" strokeWidth={1.5} />
                   <motion.select
                     value={formData.location}
                     onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                    className="w-full appearance-none rounded-xl border border-slate-700 bg-slate-950/60 pl-12 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-slate-400/60 focus:bg-slate-950/80 focus:ring-2 focus:ring-slate-500/15 hover:border-slate-600"
+                    className="w-full appearance-none rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-slate-100 outline-none transition-all focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   >
                     <option value="" className="text-slate-900">Select Location</option>
@@ -204,13 +204,13 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
                   </motion.select>
                 </div>,
                 <div key="phone" className="relative">
-                  <Phone className="absolute left-4 top-3 h-5 w-5 text-slate-400" strokeWidth={1.5} />
+                  <Phone className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" strokeWidth={1.5} />
                   <motion.input
                     type="tel"
                     placeholder="Phone Number"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950/60 backdrop-blur-sm pl-12 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-500 focus:border-slate-400/60 focus:bg-slate-950/80 focus:ring-2 focus:ring-slate-500/15 hover:border-slate-600"
+                    className="w-full rounded-xl border border-white/15 bg-white/5 pl-12 pr-4 py-3 text-slate-100 outline-none transition-all placeholder:text-slate-400 focus:border-sky-400/50 focus:bg-white/10 focus:ring-2 focus:ring-sky-500/25 hover:border-white/20"
                     required
                   />
                 </div>,
