@@ -112,7 +112,7 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
           exit={{ opacity: 0, y: 24, scale: 0.95 }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
           onClick={(e) => e.stopPropagation()}
-          className="w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950/95 shadow-[0_24px_96px_rgba(3,12,39,0.5),0_8px_32px_rgba(59,130,246,0.1)] backdrop-blur-2xl"
+          className="w-full max-w-md overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/90 to-slate-950/95 shadow-[0_24px_96px_rgba(3,12,39,0.5),0_8px_32px_rgba(59,130,246,0.1)] backdrop-blur-2xl max-h-[90vh] overflow-y-auto no-scrollbar"
         >
           {/* Top border glow */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />

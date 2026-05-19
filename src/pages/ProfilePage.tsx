@@ -263,7 +263,7 @@ const ProfilePage = () => {
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
             <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
               <div className="text-3xl font-semibold text-white mb-2">{totalListings}</div>
               <div className="text-slate-400">Active Listings</div>

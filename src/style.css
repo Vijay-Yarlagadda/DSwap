@@ -224,3 +224,12 @@ select:-webkit-autofill {
   box-shadow: 0 12px 32px rgba(59, 130, 246, 0.25);
 }
 
+/* Scrollbar visibility utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+

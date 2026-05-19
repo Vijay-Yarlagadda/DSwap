@@ -125,7 +125,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
       whileHover={{ y: -4 }}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-6 shadow-[0_18px_50px_rgba(3,12,39,0.28),0_24px_80px_rgba(14,165,233,0.15)] ring-1 ring-white/10 backdrop-blur-xl"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-5 sm:p-6 shadow-[0_18px_50px_rgba(3,12,39,0.28),0_24px_80px_rgba(14,165,233,0.15)] ring-1 ring-white/10 backdrop-blur-xl"
     >
       <motion.div
         className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-500/12 blur-3xl opacity-0 transition-all duration-300 group-hover:opacity-100"
@@ -212,11 +212,11 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
             <AnimatePresence>
               {showMenu && (
                 <motion.div
-                  initial={{ opacity: 0, y: 12, scale: 0.94 }}
+                  className="absolute right-0 top-14 z-50 w-[calc(100vw-3rem)] sm:w-56 max-w-[224px] overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl pointer-events-auto"
+                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 12, scale: 0.94 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute right-0 top-14 z-50 w-56 overflow-hidden rounded-3xl border border-white/15 bg-slate-950/95 shadow-[0_24px_80px_rgba(2,6,23,0.65)] backdrop-blur-3xl pointer-events-auto"
                 >
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
                   <div className="py-1 space-y-0.5">

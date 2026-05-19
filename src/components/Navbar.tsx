@@ -85,11 +85,11 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
               onClick={onAddListing}
               whileHover={{ scale: 1.03, y: -1 }}
               whileTap={{ scale: 0.98 }}
-              className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_48px_rgba(56,189,248,0.22)] transition duration-300 hover:shadow-[0_18px_64px_rgba(56,189,248,0.3)]"
+              className="group relative inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_48px_rgba(56,189,248,0.22)] transition duration-300 hover:shadow-[0_18px_64px_rgba(56,189,248,0.3)]"
             >
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400/30 via-sky-400/10 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
               <Plus className="relative h-4 w-4" />
-              <span className="relative">Add Listing</span>
+              <span className="relative hidden sm:inline">Add Listing</span>
             </motion.button>
 
             <div className="relative">
@@ -118,7 +118,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 12, scale: 0.95 }}
                     transition={{ duration: 0.2, ease: 'easeOut' }}
-                    className="absolute right-0 mt-2 w-72 overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-3xl z-50"
+                    className="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-72 max-w-sm overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-3xl z-50"
                   >
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
                     <div className="border-b border-white/10 px-5 py-4">

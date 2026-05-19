@@ -9,7 +9,7 @@ interface FilterChipsProps {
 const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps) => {
   return (
     <motion.div
-      className="flex flex-wrap gap-4 py-2"
+      className="flex gap-3 py-2 overflow-x-auto no-scrollbar pb-4 -mb-4"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: 0.08 }}
