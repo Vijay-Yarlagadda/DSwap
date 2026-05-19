@@ -9,42 +9,58 @@ interface FilterChipsProps {
 const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps) => {
   return (
     <motion.div 
-      className="flex space-x-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex space-x-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45, delay: 0.1 }}
     >
-      {filters.map((filter, index) => (
-        <motion.button
-          key={filter}
-          type="button"
-          onClick={() => onFilterChange(filter)}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
-          whileHover={{ scale: 1.03, y: -1 }}
-          whileTap={{ scale: 0.97 }}
-          className={`group relative whitespace-nowrap rounded-full border px-4 py-2.5 text-sm font-semibold transition duration-300 focus:outline-none focus:ring-2 focus:ring-sky-500/30 overflow-hidden ${
-            activeFilter === filter
-              ? 'border-sky-400/40 bg-gradient-to-r from-sky-500/20 to-sky-600/10 text-white shadow-[0_8px_32px_rgba(14,116,144,0.25)] ring-1 ring-sky-400/30'
-              : 'border-white/15 bg-slate-900/50 text-slate-300 hover:border-sky-400/40 hover:bg-slate-800/70 shadow-[0_4px_16px_rgba(15,23,42,0.3)]'
-          }`}
-        >
-          {/* Floating glow effect */}
-          <div className="pointer-events-none absolute -inset-0.5 rounded-full bg-gradient-to-r from-sky-400/20 via-sky-300/10 to-sky-400/20 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-100" />
-          
-          {/* Animated inner gradient on active */}
-          {activeFilter === filter && (
-            <motion.div
-              className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-500/10 via-transparent to-sky-600/10"
-              animate={{ opacity: [0.25, 0.5, 0.25] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
-          
-          <span className="relative">{filter}</span>
-        </motion.button>
-      ))}
+      {filters.map((filter, index) => {
+        const isActive = activeFilter === filter;
+        
+        return (
+          <motion.button
+            key={filter}
+            type="button"
+            onClick={() => onFilterChange(filter)}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`group relative whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-sky-500/30 overflow-hidden ${
+              isActive
+                ? 'text-white'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="activeFilter"
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 shadow-[0_0_20px_rgba(56,189,248,0.4)]"
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              />
+            )}
+            
+            {/* Border for inactive items, hidden on active */}
+            {!isActive && (
+              <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-white/20 transition-colors duration-300 bg-slate-900/50" />
+            )}
+
+            {/* Glowing dot for active item */}
+            {isActive && (
+              <motion.div
+                className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-300/20 to-blue-400/20"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            )}
+            
+            <span className="relative z-10 flex items-center space-x-2">
+              <span>{filter}</span>
+            </span>
+          </motion.button>
+        );
+      })}
     </motion.div>
   );
 };

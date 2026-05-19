@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import AuthForm from '../components/AuthForm';
+import ParticleBackground from '../components/ParticleBackground';
 
 const AuthPage = () => {
   return (
@@ -9,19 +10,10 @@ const AuthPage = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(96,165,250,0.25),transparent_32%),radial-gradient(circle_at_85%_15%,rgba(59,130,246,0.2),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(14,116,144,0.25),transparent_40%)]" />
+      {/* Smooth uniform background to prevent banding lines */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1128] to-slate-950" />
+      <ParticleBackground />
       <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay auth-noise" />
-
-      <motion.div
-        className="absolute -left-28 top-16 h-72 w-72 rounded-full bg-primary-500/35 blur-[100px]"
-        animate={{ x: [0, 45, 0], y: [0, 18, 0], scale: [1, 1.08, 1] }}
-        transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-      />
-      <motion.div
-        className="absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-cyan-400/30 blur-[120px]"
-        animate={{ x: [0, -36, 0], y: [0, -22, 0], scale: [1, 1.06, 1] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-      />
 
       <div className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-2">
         <motion.section
@@ -30,17 +22,6 @@ const AuthPage = () => {
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
         >
-          <motion.div
-            className="absolute left-20 top-24 h-36 w-36 rounded-full bg-primary-400/25 blur-3xl"
-            animate={{ y: [0, -18, 0], opacity: [0.28, 0.45, 0.28] }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute right-16 top-1/2 h-28 w-28 rounded-full bg-cyan-300/20 blur-3xl"
-            animate={{ y: [0, 16, 0], x: [0, 8, 0] }}
-            transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          />
-
           <div className="relative max-w-xl">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
