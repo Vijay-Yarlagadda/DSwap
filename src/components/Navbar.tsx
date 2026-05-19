@@ -90,6 +90,9 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400/30 via-sky-400/10 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
               <Plus className="relative h-4 w-4" />
               <span className="relative hidden sm:inline">Add Listing</span>
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-lg ring-1 ring-white/10 transition-opacity duration-200 group-hover:opacity-100 group-active:opacity-100 sm:hidden pointer-events-none">
+                Add Listing
+              </span>
             </motion.button>
 
             <div className="relative">
