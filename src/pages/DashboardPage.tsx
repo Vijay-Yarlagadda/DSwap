@@ -24,6 +24,15 @@ interface ListingDisplay extends Listing {
   isOwn: boolean;
 }
 
+const formatRelativeTime = (timestamp?: { seconds: number }) => {
+  if (!timestamp || !timestamp.seconds) return 'Just now';
+  const diffInSeconds = Math.floor(Date.now() / 1000 - timestamp.seconds);
+  if (diffInSeconds < 60) return 'Just now';
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  return `${Math.floor(diffInSeconds / 86400)}d ago`;
+};
+
 const DashboardPage = () => {
   const { currentUser } = useAuth();
   const [activeFilter, setActiveFilter] = useState('All');
@@ -42,7 +51,7 @@ const DashboardPage = () => {
       
       const displayListings: ListingDisplay[] = firestoreListings.map((listing) => ({
         ...listing,
-        lastUpdated: 'Just now',
+        lastUpdated: formatRelativeTime(listing.updatedAt || listing.createdAt),
         isOwn: listing.userId === currentUser?.uid,
       }));
 
