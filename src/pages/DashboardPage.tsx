@@ -63,65 +63,75 @@ const DashboardPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950">
-      {/* Animated background layers */}
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
       <div className="pointer-events-none absolute inset-0">
-        {/* Primary gradient blob */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_15%,rgba(59,130,246,0.25),transparent_34%),radial-gradient(circle_at_88%_20%,rgba(56,189,248,0.2),transparent_35%),radial-gradient(circle_at_50%_85%,rgba(30,64,175,0.18),transparent_40%)]" />
-        
-        {/* Enhanced ambient glow layers */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_14%,rgba(56,189,248,0.14),transparent_28%),radial-gradient(circle_at_86%_18%,rgba(59,130,246,0.12),transparent_28%),radial-gradient(circle_at_52%_90%,rgba(15,23,42,0.8),transparent_32%)]" />
         <motion.div
-          className="absolute top-0 right-1/4 h-72 w-72 rounded-full bg-sky-500/15 blur-[100px]"
-          animate={{
-            y: [0, 30, -30, 0],
-            opacity: [0.3, 0.5, 0.4, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
+          className="absolute top-0 right-1/4 h-72 w-72 rounded-full bg-sky-500/10 blur-[110px]"
+          animate={{ y: [0, 24, -24, 0], opacity: [0.2, 0.45, 0.35, 0.2] }}
+          transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
         />
-        
-        {/* Deep accent glow */}
         <motion.div
-          className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-blue-900/20 blur-3xl"
-          animate={{
-            y: [0, -40, 40, 0],
-            opacity: [0.2, 0.4, 0.3, 0.2],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 0.5,
-          }}
+          className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-blue-900/25 blur-3xl"
+          animate={{ y: [0, -32, 32, 0], opacity: [0.15, 0.35, 0.25, 0.15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
         />
-        
-        {/* Soft vignette effect */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(2,6,23,0.35)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(2,6,23,0.4)_100%)]" />
       </div>
-      
+
       <Navbar onAddListing={() => setIsModalOpen(true)} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: 'easeOut' }}
-        className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6"
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+        className="relative z-10 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
       >
-        <motion.div 
-          className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-b from-slate-900/95 to-slate-950/90 p-5 shadow-[0_30px_80px_rgba(3,9,23,0.45),0_0_40px_rgba(59,130,246,0.08)] backdrop-blur-2xl sm:p-6 transition-all duration-500"
+        <motion.section
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.05 }}
+          className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/90 p-6 shadow-[0_30px_90px_rgba(3,9,23,0.4)] backdrop-blur-2xl sm:p-8"
+        >
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="space-y-4">
+              <p className="text-sm uppercase tracking-[0.3em] text-slate-400 font-semibold">DSwap Dashboard</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                Discover premium exchange opportunities in your community.
+              </h1>
+              <p className="max-w-2xl text-slate-400 sm:text-base">
+                Browse real-time listings, filter by location, and manage your offers from a cinematic, fintech-inspired dashboard.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Active</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{listings.length}</p>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Location</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{activeFilter}</p>
+              </div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/60 p-4 text-center shadow-[0_10px_30px_rgba(9,20,58,0.25)] backdrop-blur-xl">
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Updated</p>
+                <p className="mt-2 text-2xl font-semibold text-white">Live feed</p>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.div
+          className="group relative overflow-visible rounded-[2rem] border border-white/10 bg-gradient-to-b from-slate-900/95 via-slate-950/85 to-slate-950/95 p-5 shadow-[0_30px_90px_rgba(3,9,23,0.45),0_0_40px_rgba(59,130,246,0.08)] backdrop-blur-2xl sm:p-6"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          whileHover={{ boxShadow: '0_30px_80px_rgba(3,9,23,0.55),0_0_50px_rgba(59,130,246,0.12)' }}
+          whileHover={{ boxShadow: '0_30px_90px_rgba(3,9,23,0.55),0_0_50px_rgba(59,130,246,0.12)' }}
         >
-          {/* Floating glow effect on hover */}
-          <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-sky-500/10 blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-          
-          <motion.p 
-            className="mb-3 text-xs uppercase tracking-[0.16em] text-slate-400 font-medium"
+          <div className="pointer-events-none absolute -right-14 -top-14 h-40 w-40 rounded-full bg-sky-500/8 blur-3xl opacity-80" />
+          <div className="pointer-events-none absolute left-8 top-8 h-24 w-24 rounded-full bg-blue-500/8 blur-2xl opacity-90" />
+
+          <motion.p
+            className="mb-4 text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.15, duration: 0.35 }}

@@ -108,7 +108,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -6, scale: 1.015 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/15 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-950/90 p-6 shadow-[0_8px_32px_rgba(3,12,39,0.3),0_16px_64px_rgba(3,12,39,0.25),0_24px_80px_rgba(6,15,41,0.2)] ring-1 ring-white/10 backdrop-blur-lg transition-all duration-500"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-6 shadow-[0_18px_50px_rgba(3,12,39,0.28),0_24px_80px_rgba(14,165,233,0.15)] ring-1 ring-white/10 backdrop-blur-xl transition-all duration-500"
     >
       {/* Ambient glow layers */}
       <motion.div
@@ -172,23 +172,23 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
               </div>
             </motion.div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <motion.div
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                <h3 className="text-4xl font-bold tracking-tight text-white">
+                <h3 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
               </motion.div>
               <motion.div
-                className="inline-flex items-center rounded-full border border-sky-400/30 bg-gradient-to-r from-sky-500/15 to-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 shadow-[0_8px_24px_rgba(56,189,248,0.15)] backdrop-blur-sm"
-                initial={{ opacity: 0, scale: 0.9 }}
+                className="inline-flex items-center gap-2 rounded-full border border-sky-400/15 bg-slate-950/70 px-3 py-1.5 text-xs font-semibold text-slate-200 shadow-[0_12px_30px_rgba(56,189,248,0.14)] backdrop-blur-sm"
+                initial={{ opacity: 0, scale: 0.92 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <MapPin className="mr-1.5 h-3.5 w-3.5 text-sky-300" />
+                <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-sky-300 shadow-[0_0_16px_rgba(56,189,248,0.25)]" />
                 <span>{listing.location}</span>
               </motion.div>
             </div>
@@ -275,13 +275,12 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
       <motion.button
         onClick={handleContact}
-        whileHover={{ scale: 1.04, y: -2, boxShadow: '0_24px_80px_rgba(59,130,246,0.35)' }}
+        whileHover={{ scale: 1.03, y: -1 }}
         whileTap={{ scale: 0.96 }}
-        className="relative w-full flex items-center justify-center space-x-2 rounded-2xl border border-sky-400/30 bg-gradient-to-r from-emerald-500/80 via-cyan-500/80 to-sky-500/80 backdrop-blur-sm py-3 font-semibold text-white shadow-[0_12px_48px_rgba(14,116,144,0.3),0_4px_16px_rgba(59,130,246,0.2)] transition duration-300 overflow-hidden group/btn"
+        className="group relative w-full flex items-center justify-center gap-2 overflow-hidden rounded-3xl border border-slate-800/80 bg-gradient-to-r from-slate-900/80 via-slate-900/70 to-slate-950/90 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_52px_rgba(3,12,39,0.28)] transition duration-300 hover:border-sky-400/30 hover:shadow-[0_20px_64px_rgba(14,165,233,0.24)]"
       >
-        {/* Button glow on hover */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-400/30 via-cyan-400/30 to-sky-400/30 opacity-0 blur transition-opacity duration-300 group-hover/btn:opacity-100" />
-        <Phone className="h-4 w-4 relative" />
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/15 via-sky-400/10 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
+        <Phone className="h-4 w-4 relative text-sky-200" />
         <span className="relative">Contact {listing.phone}</span>
       </motion.button>
     </motion.div>
