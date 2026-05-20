@@ -1,7 +1,7 @@
 import { User, Clock, Phone, Trash2, MoreVertical, Edit, CheckCircle } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, memo } from 'react';
 import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Listing {
   id?: string;
@@ -120,27 +120,18 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
   return (
     <motion.div
-      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      whileHover={{ y: -4 }}
-      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-5 sm:p-6 shadow-[0_18px_50px_rgba(3,12,39,0.28),0_24px_80px_rgba(14,165,233,0.15)] ring-1 ring-white/10 backdrop-blur-xl"
+      className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-slate-950/95 via-slate-900/90 to-slate-950/90 p-5 sm:p-6 shadow-[0_14px_36px_rgba(3,12,39,0.22),0_16px_40px_rgba(14,165,233,0.12)] ring-1 ring-white/10 backdrop-blur-xl transition-transform duration-200 hover:-translate-y-1"
     >
-      <motion.div
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-500/12 blur-3xl opacity-0 transition-all duration-300 group-hover:opacity-100"
-        animate={{ scale: [1, 1.08, 1] }}
-        transition={{ duration: 2.5, repeat: Infinity, repeatType: 'reverse' }}
-      />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-sky-500/12 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-80" />
       <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-t from-transparent via-transparent to-white/5" />
-      <motion.div
-        className="pointer-events-none absolute -bottom-12 -right-12 h-32 w-32 rounded-full bg-indigo-600/10 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      />
+      <div className="pointer-events-none absolute -bottom-12 -right-12 h-32 w-32 rounded-full bg-indigo-600/10 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-80" />
 
       <div className="relative z-50 flex justify-between items-start mb-4">
         <div className="flex-1">
           {isEditing ? (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }} className="space-y-3">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-sky-400 bg-clip-text text-transparent">₹</span>
                 <input
@@ -154,131 +145,94 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                 />
               </div>
               <div className="flex flex-wrap gap-2">
-                <motion.button
+                <button
                   onClick={handleSaveEdit}
                   disabled={isUpdating}
-                  whileHover={{ scale: 1.05, y: -1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(16,185,129,0.2)] transition hover:shadow-[0_12px_34px_rgba(16,185,129,0.28)] disabled:opacity-50"
+                  className="rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_26px_rgba(16,185,129,0.16)] transition duration-200 hover:shadow-[0_12px_32px_rgba(16,185,129,0.22)] disabled:opacity-50"
                 >
                   {isUpdating ? 'Saving...' : 'Save'}
-                </motion.button>
-                <motion.button
+                </button>
+                <button
                   onClick={handleCancelEdit}
-                  whileHover={{ scale: 1.05, y: -1 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/15 hover:border-white/20"
+                  className="rounded-2xl border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 transition duration-200 hover:bg-white/15 hover:border-white/20"
                 >
                   Cancel
-                </motion.button>
+                </button>
               </div>
-            </motion.div>
+            </div>
           ) : (
             <div className="space-y-4">
-              <motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.08, duration: 0.25 }}
-              >
+              <div>
                 <h3 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
-              </motion.div>
-              <motion.div
-                className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/20 bg-sky-950/40 px-2.5 py-1 text-xs font-semibold text-sky-100 shadow-[0_0_20px_rgba(56,189,248,0.15)] backdrop-blur-md"
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15, duration: 0.25 }}
-              >
-                <span className="flex h-1.5 w-1.5 items-center justify-center rounded-full bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.8)] animate-pulse" />
+              </div>
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/20 bg-sky-950/40 px-3 py-1.5 text-sm font-semibold text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.1)] backdrop-blur-sm leading-none">
+                <span className="flex h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)] animate-pulse" />
                 <span className="tracking-wide uppercase">{listing.location}</span>
-              </motion.div>
+              </div>
             </div>
           )}
         </div>
 
         {listing.isOwn && (
           <div className="relative z-20" ref={menuRef}>
-            <motion.button
+            <button
               onClick={() => setShowMenu(!showMenu)}
-              whileHover={{ scale: 1.08, rotate: 90 }}
-              whileTap={{ scale: 0.92 }}
-              transition={{ duration: 0.12 }}
-              className="rounded-3xl border border-white/10 bg-slate-900/85 p-2.5 text-slate-300 transition hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_8px_24px_rgba(3,12,39,0.25)]"
+              className="rounded-3xl border border-white/10 bg-slate-900/85 p-2.5 text-slate-300 transition duration-200 hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_6px_18px_rgba(3,12,39,0.18)]"
               title="More options"
             >
               <MoreVertical className="h-4 w-4" />
-            </motion.button>
-            <AnimatePresence>
-              {showMenu && (
-                <motion.div
-                  className="absolute right-0 top-14 z-50 w-44 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl backdrop-blur-xl pointer-events-auto"
-                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                >
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
-                  <div className="py-1 space-y-0.5">
-                    <motion.button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEdit();
-                      }}
-                      whileHover={{ x: 4 }}
-                      transition={{ duration: 0.15 }}
-                      className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-slate-200 transition duration-150 hover:bg-sky-500/10 cursor-pointer"
-                    >
-                      <Edit className="mr-2.5 h-3.5 w-3.5 text-sky-300" />
-                      Edit Amount
-                    </motion.button>
-                    <motion.button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleComplete();
-                      }}
-                      disabled={isCompleting}
-                      whileHover={!isCompleting ? { x: 4 } : {}}
-                      whileTap={!isCompleting ? { scale: 0.98 } : {}}
-                      transition={{ duration: 0.15 }}
-                      className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-emerald-200 transition duration-150 disabled:opacity-50 hover:text-emerald-100 hover:bg-emerald-500/15 cursor-pointer"
-                    >
-                      <CheckCircle className="mr-2.5 h-3.5 w-3.5 text-emerald-400" />
-                      {isCompleting ? 'Completing...' : 'DSwap Done'}
-                    </motion.button>
-                    <motion.button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete();
-                      }}
-                      disabled={isDeleting}
-                      whileHover={!isDeleting ? { x: 4 } : {}}
-                      whileTap={!isDeleting ? { scale: 0.98 } : {}}
-                      transition={{ duration: 0.15 }}
-                      className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-rose-200 transition duration-150 disabled:opacity-50 hover:text-rose-100 hover:bg-rose-500/15 cursor-pointer"
-                    >
-                      <Trash2 className="mr-2.5 h-3.5 w-3.5 text-rose-300" />
-                      Delete
-                    </motion.button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 top-14 z-50 w-44 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-xl backdrop-blur-xl pointer-events-auto">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
+                <div className="py-1 space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit();
+                    }}
+                    className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-slate-200 transition duration-150 hover:bg-sky-500/10"
+                  >
+                    <Edit className="mr-2.5 h-3.5 w-3.5 text-sky-300" />
+                    Edit Amount
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleComplete();
+                    }}
+                    disabled={isCompleting}
+                    className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-emerald-200 transition duration-150 disabled:opacity-50 hover:text-emerald-100 hover:bg-emerald-500/15"
+                  >
+                    <CheckCircle className="mr-2.5 h-3.5 w-3.5 text-emerald-400" />
+                    {isCompleting ? 'Completing...' : 'DSwap Done'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    disabled={isDeleting}
+                    className="flex w-full items-center px-3.5 py-2.5 text-sm font-medium text-rose-200 transition duration-150 disabled:opacity-50 hover:text-rose-100 hover:bg-rose-500/15"
+                  >
+                    <Trash2 className="mr-2.5 h-3.5 w-3.5 text-rose-300" />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
 
-      <motion.div
-        className="relative z-10 space-y-3 mb-6 pb-4 border-b border-white/10"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.12, duration: 0.25 }}
-      >
+      <div className="relative z-10 space-y-3 mb-6 pb-4 border-b border-white/10">
         <div className="flex items-center text-slate-100 font-medium">
-          <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-3xl bg-slate-900/80 text-sky-300 shadow-[0_12px_30px_rgba(56,189,248,0.12)]">
+          <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-3xl bg-slate-900/80 text-sky-300 shadow-[0_10px_24px_rgba(56,189,248,0.1)]">
             <User className="h-4 w-4" />
           </div>
           <span>{listing.name}</span>
@@ -288,25 +242,20 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
           <Clock className="mr-1.5 h-3 w-3" />
           <span>Updated {listing.lastUpdated}</span>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div
-        whileHover={{ scale: 1.02, y: -2 }}
-        transition={{ duration: 0.2 }}
-        className="relative"
-      >
-        <motion.button
+      <div className="relative">
+        <button
           onClick={handleContact}
-          whileTap={{ scale: 0.96 }}
-          className="group relative w-full flex items-center justify-center gap-2 overflow-hidden rounded-2xl border border-sky-400/40 bg-gradient-to-r from-sky-500/20 via-cyan-500/10 to-blue-500/15 px-5 py-3.5 text-sm font-semibold text-sky-100 shadow-[0_12px_40px_rgba(14,165,233,0.2),inset_0_1px_0_rgba(255,255,255,0.15)] backdrop-blur-sm transition duration-300 hover:border-sky-400/60 hover:bg-gradient-to-r hover:from-sky-500/30 hover:via-cyan-500/20 hover:to-blue-500/25 hover:shadow-[0_16px_48px_rgba(14,165,233,0.35)]"
+          className="group relative w-full flex items-center justify-center gap-2 overflow-hidden rounded-2xl border border-sky-400/40 bg-gradient-to-r from-sky-500/20 via-cyan-500/10 to-blue-500/15 px-5 py-3.5 text-sm font-semibold text-sky-100 shadow-[0_10px_30px_rgba(14,165,233,0.16),inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-sm transition duration-200 hover:border-sky-400/60 hover:bg-gradient-to-r hover:from-sky-500/30 hover:via-cyan-500/20 hover:to-blue-500/25 hover:shadow-[0_14px_36px_rgba(14,165,233,0.22)]"
         >
-          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400/25 via-sky-400/15 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-400/25 via-sky-400/15 to-transparent opacity-0 transition duration-200 group-hover:opacity-100" />
           <Phone className="h-5 w-5 relative text-sky-200" />
           <span className="relative">Contact {listing.phone}</span>
-        </motion.button>
-      </motion.div>
+        </button>
+      </div>
     </motion.div>
   );
 };
 
-export default ListingCard;
+export default memo(ListingCard);
