@@ -3,6 +3,33 @@ import { useState, useRef, useEffect, memo } from 'react';
 import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
 
+const LOCATION_STYLE_MAP: Record<string, { dot: string; badge: string }> = {
+  'Block A': {
+    dot: 'bg-cyan-400 shadow-[0_0_10px_rgba(56,189,248,0.35)]',
+    badge: 'border-cyan-400/20 text-cyan-100',
+  },
+  'Block B': {
+    dot: 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.35)]',
+    badge: 'border-emerald-400/20 text-emerald-100',
+  },
+  'Block C': {
+    dot: 'bg-indigo-400 shadow-[0_0_10px_rgba(99,102,241,0.35)]',
+    badge: 'border-indigo-400/20 text-indigo-100',
+  },
+  Library: {
+    dot: 'bg-fuchsia-400 shadow-[0_0_10px_rgba(232,121,249,0.35)]',
+    badge: 'border-fuchsia-400/20 text-fuchsia-100',
+  },
+  Lakeview: {
+    dot: 'bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.35)]',
+    badge: 'border-amber-400/20 text-amber-100',
+  },
+  Cuisine: {
+    dot: 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.35)]',
+    badge: 'border-rose-400/20 text-rose-100',
+  },
+};
+
 interface Listing {
   id?: string;
   amount: number;
@@ -167,8 +194,8 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-1 rounded-full border border-sky-400/20 bg-sky-950/40 px-2.5 py-1 text-xs font-semibold text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.1)] backdrop-blur-sm leading-none">
-                <span className="flex h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)] animate-pulse" />
+              <div className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold shadow-[0_0_16px_rgba(0,0,0,0.12)] backdrop-blur-sm leading-none ${LOCATION_STYLE_MAP[listing.location]?.badge || 'border-sky-400/20 text-sky-100 bg-sky-950/40'}`}>
+                <span className={`flex h-1.5 w-1.5 rounded-full ${LOCATION_STYLE_MAP[listing.location]?.dot || 'bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)]'} animate-pulse`} />
                 <span className="tracking-wide uppercase">{listing.location}</span>
               </div>
             </div>
@@ -177,13 +204,19 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
         {listing.isOwn && (
           <div className="relative z-20" ref={menuRef}>
-            <button
+            <motion.button
+              type="button"
               onClick={() => setShowMenu(!showMenu)}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-slate-900/85 text-slate-300 transition duration-200 hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_6px_18px_rgba(3,12,39,0.18)]"
+              initial={{ rotate: 0, scale: 1 }}
+              whileHover={{ rotate: 180, scale: 1.06 }}
+              whileTap={{ rotate: 0, scale: 0.96 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              className="transform-gpu flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-slate-900/85 text-slate-300 transition duration-200 hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_6px_18px_rgba(3,12,39,0.18)]"
               title="More options"
+              aria-label="More options"
             >
               <MoreVertical className="h-3.5 w-3.5" />
-            </button>
+            </motion.button>
             {showMenu && (
               <div className="absolute right-0 top-14 z-50 w-44 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-xl backdrop-blur-xl pointer-events-auto">
                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
