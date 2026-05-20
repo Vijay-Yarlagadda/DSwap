@@ -128,8 +128,8 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-gradient-to-t from-transparent via-transparent to-white/5" />
       <div className="pointer-events-none absolute -bottom-12 -right-12 h-32 w-32 rounded-full bg-indigo-600/10 blur-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-80" />
 
-      <div className="relative z-50 flex justify-between items-start mb-4">
-        <div className="flex-1">
+      <div className="relative z-50 flex justify-between items-center mb-4">
+        <div className="flex-1 min-w-0">
           {isEditing ? (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
               </div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-400/20 bg-sky-950/40 px-3 py-1.5 text-sm font-semibold text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.1)] backdrop-blur-sm leading-none">
+              <div className="inline-flex items-center gap-1 rounded-full border border-sky-400/20 bg-sky-950/40 px-2.5 py-1 text-xs font-semibold text-sky-100 shadow-[0_0_16px_rgba(56,189,248,0.1)] backdrop-blur-sm leading-none">
                 <span className="flex h-1.5 w-1.5 rounded-full bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)] animate-pulse" />
                 <span className="tracking-wide uppercase">{listing.location}</span>
               </div>
@@ -179,10 +179,10 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
           <div className="relative z-20" ref={menuRef}>
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="rounded-3xl border border-white/10 bg-slate-900/85 p-2.5 text-slate-300 transition duration-200 hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_6px_18px_rgba(3,12,39,0.18)]"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-slate-900/85 text-slate-300 transition duration-200 hover:border-sky-400/30 hover:bg-slate-900/95 shadow-[0_6px_18px_rgba(3,12,39,0.18)]"
               title="More options"
             >
-              <MoreVertical className="h-4 w-4" />
+              <MoreVertical className="h-3.5 w-3.5" />
             </button>
             {showMenu && (
               <div className="absolute right-0 top-14 z-50 w-44 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-xl backdrop-blur-xl pointer-events-auto">
