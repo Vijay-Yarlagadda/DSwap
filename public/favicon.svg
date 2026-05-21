@@ -1,26 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" shape-rendering="geometricPrecision">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="28" fill="#061428" />
+  <g filter="url(#glow)">
+    <path d="M42 28 L42 100 L66 100 C92 100 100 84 100 64 C100 44 92 28 66 28 Z" fill="#0b3f71" />
+  </g>
+  <path d="M42 28 L42 100 L66 100 C92 100 100 84 100 64 C100 44 92 28 66 28 Z" fill="none" stroke="#38c8ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M50 36 L50 92" stroke="#a9e7ff" stroke-width="10" stroke-linecap="round" />
   <defs>
-    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#42e3ff" />
-      <stop offset="100%" stop-color="#1f6eff" />
-    </linearGradient>
-    <filter id="blurGlow" x="-40%" y="-40%" width="180%" height="180%">
-      <feGaussianBlur stdDeviation="6" result="glow" />
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
       <feMerge>
-        <feMergeNode in="glow" />
+        <feMergeNode in="blur" />
         <feMergeNode in="SourceGraphic" />
       </feMerge>
     </filter>
   </defs>
-  <rect width="128" height="128" rx="30" fill="#07172f" />
-  <rect x="12" y="12" width="104" height="104" rx="26" fill="#0b203f" />
-  <path d="M44 28 V100" stroke="url(#glow)" stroke-width="16" stroke-linecap="round" filter="url(#blurGlow)" />
-  <path d="M44 28 H62 C88 28 92 64 62 64 H44" stroke="url(#glow)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-  <path d="M44 64 H62 C88 64 92 100 62 100 H44" stroke="url(#glow)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-  <path d="M72 32 L86 32 L82 28" fill="none" stroke="#42e3ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M72 96 L86 96 L82 100" fill="none" stroke="#42e3ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M56 46 H74" stroke="#d2f9ff" stroke-width="8" stroke-linecap="round" />
-  <path d="M56 58 H72" stroke="#d2f9ff" stroke-width="8" stroke-linecap="round" />
-  <path d="M62 40 V80" stroke="#d2f9ff" stroke-width="8" stroke-linecap="round" />
-  <path d="M62 80 C68 80 78 74 78 66" stroke="#d2f9ff" stroke-width="8" stroke-linecap="round" fill="none" />
 </svg>
