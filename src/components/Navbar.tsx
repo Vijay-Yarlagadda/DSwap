@@ -146,8 +146,7 @@ const Navbar = ({ onAddListing }: NavbarProps) => {
                             {initials || 'U'}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-slate-100">Signed in as</p>
-                            <p className="text-sm text-slate-300 truncate max-w-[220px]">{displayName}</p>
+                            <p className="text-sm font-semibold text-slate-100 truncate max-w-[220px]">{displayName}</p>
                             <p className="text-xs text-slate-500 truncate max-w-[220px]">{currentUser?.email}</p>
                           </div>
                         </div>
