@@ -13,6 +13,40 @@ interface UserProfile {
   phone: string;
 }
 
+type ActivityType = 'completed' | 'deleted';
+
+interface ActivityItem {
+  id: string;
+  type: ActivityType;
+  title: string;
+  description: string;
+  timestamp: number;
+}
+
+const STORAGE_KEY = 'dswap_recent_activity';
+
+const formatActivityDate = (timestamp: number) => {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
+const loadStoredActivity = (): ActivityItem[] => {
+  if (typeof window === 'undefined') return [];
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return [];
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 const ProfilePage = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
@@ -24,16 +58,38 @@ const ProfilePage = () => {
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [totalListings, setTotalListings] = useState(0);
   const [completedListings, setCompletedListings] = useState(0);
+  const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
     loadUserProfile();
-    
+    setRecentActivity(loadStoredActivity());
+
     if (currentUser) {
       const unsubscribeActive = subscribeToUserListings(currentUser.uid, (listings: any[]) => {
         setTotalListings(listings.length);
       });
       const unsubscribeCompleted = subscribeToCompletedListings(currentUser.uid, (listings: any[]) => {
         setCompletedListings(listings.length);
+
+        const completedActivities = listings
+          .map((listing) => ({
+            id: listing.id || `${listing.userId}-${listing.updatedAt?.seconds || listing.createdAt?.seconds || Date.now()}`,
+            type: 'completed' as const,
+            title: 'DSwap completed',
+            description: `${listing.amount} ₹ • ${listing.location || 'Unknown location'}`,
+            timestamp: listing.completedAt?.seconds || listing.updatedAt?.seconds || Math.floor(Date.now() / 1000),
+          }))
+          .sort((a, b) => b.timestamp - a.timestamp);
+
+        setRecentActivity(() => {
+          const stored = loadStoredActivity();
+          const merged = [...stored, ...completedActivities];
+          const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
+            acc[item.id] = item;
+            return acc;
+          }, {} as Record<string, ActivityItem>);
+          return Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6);
+        });
       });
       
       return () => {
@@ -280,34 +336,26 @@ const ProfilePage = () => {
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-xl">
             <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
-            <div className="space-y-4">
-              {totalListings === 0 && completedListings === 0 ? (
-                <p className="text-slate-300 text-center py-8">No listings yet. Create your first listing!</p>
+            <div className="space-y-3">
+              {recentActivity.length === 0 ? (
+                <p className="text-slate-300 text-center py-8">No recent activity yet. Complete or delete a listing to see your activity here.</p>
               ) : (
-                <>
-                  {totalListings > 0 && (
-                    <div className="flex items-center justify-between py-3 border-b border-white/10">
-                      <div className="flex items-center space-x-3">
-                        <Package className="h-5 w-5 text-sky-400" />
+                recentActivity.map((activity) => (
+                  <div key={activity.id} className="rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-4 text-sm text-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${activity.type === 'completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-rose-400/10 text-rose-300'}`}>
+                          {activity.type === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Package className="h-5 w-5" />}
+                        </div>
                         <div>
-                          <p className="font-medium text-slate-100">Active listings</p>
-                          <p className="text-sm text-slate-300">You have {totalListings} listing{totalListings !== 1 ? 's' : ''} available</p>
+                          <p className="font-semibold text-white">{activity.title}</p>
+                          <p className="text-slate-400">{activity.description}</p>
                         </div>
                       </div>
+                      <span className="text-xs text-slate-500">{formatActivityDate(activity.timestamp)}</span>
                     </div>
-                  )}
-                  {completedListings > 0 && (
-                    <div className="flex items-center justify-between py-3 border-b border-white/10">
-                      <div className="flex items-center space-x-3">
-                        <CheckCircle className="h-5 w-5 text-emerald-400" />
-                        <div>
-                          <p className="font-medium text-slate-100">Completed exchanges</p>
-                          <p className="text-sm text-slate-300">You have completed {completedListings} exchange{completedListings !== 1 ? 's' : ''}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </>
+                  </div>
+                ))
               )}
             </div>
           </div>

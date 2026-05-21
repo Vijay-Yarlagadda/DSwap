@@ -48,6 +48,8 @@ interface ListingCardProps {
   onListingEdited?: () => void;
 }
 
+const STORAGE_KEY = 'dswap_recent_activity';
+
 const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingEdited }: ListingCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
@@ -56,6 +58,26 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   const [editAmount, setEditAmount] = useState(listing.amount.toString());
   const [isUpdating, setIsUpdating] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const saveDeletedActivity = () => {
+    if (!listing.id) return;
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : [];
+      const activity = {
+        id: `deleted-${listing.id}-${Date.now()}`,
+        type: 'deleted',
+        title: 'Deleted listing',
+        description: `${listing.amount} ₹ • ${listing.location}`,
+        timestamp: Math.floor(Date.now() / 1000),
+      };
+      const next = [activity, ...(Array.isArray(existing) ? existing : [])].slice(0, 8);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch (err) {
+      console.error('Failed to save deleted activity', err);
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,6 +98,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       try {
         if (listing.id) {
           await deleteListing(listing.id);
+          saveDeletedActivity();
           setShowMenu(false);
           onListingDeleted?.();
         }
