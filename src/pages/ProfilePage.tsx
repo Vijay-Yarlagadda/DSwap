@@ -29,10 +29,10 @@ const ProfilePage = () => {
     loadUserProfile();
     
     if (currentUser) {
-      const unsubscribeActive = subscribeToUserListings(currentUser.uid, (listings) => {
+      const unsubscribeActive = subscribeToUserListings(currentUser.uid, (listings: any[]) => {
         setTotalListings(listings.length);
       });
-      const unsubscribeCompleted = subscribeToCompletedListings(currentUser.uid, (listings) => {
+      const unsubscribeCompleted = subscribeToCompletedListings(currentUser.uid, (listings: any[]) => {
         setCompletedListings(listings.length);
       });
       

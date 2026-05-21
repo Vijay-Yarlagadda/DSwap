@@ -27,6 +27,8 @@ export function getListings(filters?: { location?: string }): Promise<Listing[]>
 export function updateListingAmount(listingId: string, amount: number): Promise<void>;
 export function deleteListing(listingId: string): Promise<void>;
 export function completeListing(listingId: string): Promise<void>;
+export function subscribeToUserListings(uid: string, callback: (listings: Listing[]) => void): () => void;
+export function subscribeToCompletedListings(uid: string, callback: (listings: Listing[]) => void): () => void;
 export function fetchCompletedListings(uid: string): Promise<Listing[]>;
 
 export function fetchListings(): Promise<Listing[]>;

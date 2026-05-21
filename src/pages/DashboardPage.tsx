@@ -5,7 +5,7 @@ import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
 import { getListings } from '../services/firestoreService.js';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface Listing {
   id?: string;
