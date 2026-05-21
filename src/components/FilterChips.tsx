@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+
 interface FilterChipsProps {
   filters: string[];
   activeFilter: string;
@@ -11,19 +13,23 @@ const FilterChips = ({ filters, activeFilter, onFilterChange }: FilterChipsProps
         const isActive = activeFilter === filter;
 
         return (
-          <button
+          <motion.button
             key={filter}
             type="button"
             onClick={() => onFilterChange(filter)}
-            className={`relative px-3 py-1.5 rounded-full text-base font-semibold transition-colors duration-200 ${
+            whileTap={{ scale: 0.96 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className={`relative px-3 py-1.5 rounded-full text-base font-semibold transition-all duration-200 ${
               isActive
                 ? 'text-sky-300'
                 : 'text-slate-300 hover:text-slate-100'
             }`}
           >
             {filter}
-            {isActive && <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500" />}
-          </button>
+            {isActive && (
+              <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-200" />
+            )}
+          </motion.button>
         );
       })}
     </div>

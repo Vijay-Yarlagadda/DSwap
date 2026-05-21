@@ -5,7 +5,7 @@ import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
 import { getListings } from '../services/firestoreService.js';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Listing {
   id?: string;
@@ -119,17 +119,34 @@ const DashboardPage = () => {
             </div>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-            {listings.map((listing) => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
-                onListingDeleted={loadListings}
-                onListingCompleted={loadListings}
-                onListingEdited={loadListings}
-              />
-            ))}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeFilter}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            >
+              {listings.map((listing) => (
+                <motion.div
+                  key={listing.id}
+                  layout
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  <ListingCard
+                    listing={listing}
+                    onListingDeleted={loadListings}
+                    onListingCompleted={loadListings}
+                    onListingEdited={loadListings}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
         )}
       </motion.div>
 
