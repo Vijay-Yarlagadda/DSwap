@@ -151,13 +151,15 @@ const ProfilePage = () => {
     
     const sorted = Object.values(unique).sort((a, b) => b.timestamp - a.timestamp);
     const createdCount = sorted.filter((activity) => activity.type === 'created').length;
+    const fallbackTotal = totalListings + completedListings;
+    const displayTotal = createdCount > 0 ? createdCount : fallbackTotal;
 
     console.log('Final unique activities:', sorted.length);
     sorted.forEach((a, i) => {
       console.log(`  ${i + 1}. ${a.title} - ${a.type}`);
     });
 
-    setCreatedListingsCount(createdCount);
+    setCreatedListingsCount(displayTotal);
     setRecentActivity(sorted.slice(0, 10));
   }, [firestoreActivities, completedActivitiesState, totalListings, completedListings]);
 
