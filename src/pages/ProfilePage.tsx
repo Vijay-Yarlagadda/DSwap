@@ -406,17 +406,17 @@ const ProfilePage = () => {
             </motion.div>
             <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-center backdrop-blur-xl">
               <div className="text-3xl font-semibold text-white mb-2">{completedListings}</div>
-              <div className="text-slate-400">Completed Exchanges</div>
+              <div className="text-slate-400">DSwap done</div>
             </motion.div>
             <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 text-center backdrop-blur-xl">
               <div className="text-3xl font-semibold text-white mb-2">{totalListings + completedListings}</div>
-              <div className="text-slate-400">Total Exchanges</div>
+              <div className="text-slate-400">Total Listings</div>
             </motion.div>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-xl">
             <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-[28rem] overflow-y-auto pr-2">
               {recentActivity.length === 0 ? (
                 <p className="text-slate-300 text-center py-8">No recent activity yet. Complete or delete a listing to see your activity here.</p>
               ) : (
