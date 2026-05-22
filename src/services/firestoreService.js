@@ -258,12 +258,15 @@ export const addActivity = async (uid, activity) => {
       type: activity.type,
       title: activity.title,
       description: activity.description,
-      timestamp: Math.floor(Date.now() / 1000),
+      timestamp: activity.timestamp || Math.floor(Date.now() / 1000),
       createdAt: serverTimestamp(),
     };
-    const docRef = await addDoc(collection(db, ACTIVITIES_COLLECTION), payload);
-    console.log('Activity saved to Firestore successfully:', docRef.id, activity.type);
-    return docRef.id;
+    const activityDoc = activity.id
+      ? doc(db, ACTIVITIES_COLLECTION, activity.id)
+      : doc(collection(db, ACTIVITIES_COLLECTION));
+    await setDoc(activityDoc, payload);
+    console.log('Activity saved to Firestore successfully:', activityDoc.id, activity.type);
+    return activityDoc.id;
   } catch (error) {
     console.error('Failed to add activity to Firestore:', error);
     throw error;

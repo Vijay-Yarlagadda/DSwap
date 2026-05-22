@@ -95,7 +95,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
       console.log('Deleted activity saved to localStorage');
       
-      // Also persist activity to Firestore so it appears on other devices
+      // Also persist activity to Firestore so it appears on other devices using the same activity ID
       if (currentUser && (currentUser as any).uid) {
         (fireService as any).addActivity((currentUser as any).uid, activity)
           .then(() => {

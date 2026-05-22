@@ -165,7 +165,8 @@ const ProfilePage = () => {
         const stored = loadStoredActivity();
         const merged = [...stored, ...firestoreActivities, ...completedActivitiesState];
         const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
-          acc[item.id] = item;
+          const key = item.id || `${item.type}-${item.description}-${item.timestamp}`;
+          acc[key] = item;
           return acc;
         }, {} as Record<string, ActivityItem>);
         const sorted = Object.values(unique).sort((a, b) => b.timestamp - a.timestamp);
