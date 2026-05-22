@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut, Trash2 } from 'lucide-react';
+import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut, Trash2, PlusCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
@@ -14,7 +14,7 @@ interface UserProfile {
   phone: string;
 }
 
-type ActivityType = 'completed' | 'deleted';
+type ActivityType = 'completed' | 'deleted' | 'created';
 
 interface ActivityItem {
   id: string;
@@ -74,6 +74,7 @@ const ProfilePage = () => {
   const [editedProfile, setEditedProfile] = useState<UserProfile | null>(null);
   const [totalListings, setTotalListings] = useState(0);
   const [completedListings, setCompletedListings] = useState(0);
+  const [createdListingsCount, setCreatedListingsCount] = useState(0);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
   const [firestoreActivities, setFirestoreActivities] = useState<ActivityItem[]>([]);
   const [completedActivitiesState, setCompletedActivitiesState] = useState<ActivityItem[]>([]);
@@ -143,19 +144,22 @@ const ProfilePage = () => {
     console.log('Merging activities - Stored:', stored.length, 'Firestore:', firestoreActivities.length, 'Completed:', completedActivitiesState.length);
     
     const unique = allActivities.reduce<Record<string, ActivityItem>>((acc, item) => {
-      acc[item.id] = item;
+      const key = item.id || `${item.type}-${item.description}-${item.timestamp}`;
+      acc[key] = item;
       return acc;
     }, {} as Record<string, ActivityItem>);
     
     const sorted = Object.values(unique).sort((a, b) => b.timestamp - a.timestamp);
-    
+    const createdCount = sorted.filter((activity) => activity.type === 'created').length;
+
     console.log('Final unique activities:', sorted.length);
     sorted.forEach((a, i) => {
       console.log(`  ${i + 1}. ${a.title} - ${a.type}`);
     });
-    
+
+    setCreatedListingsCount(createdCount);
     setRecentActivity(sorted.slice(0, 10));
-  }, [firestoreActivities, completedActivitiesState]);
+  }, [firestoreActivities, completedActivitiesState, totalListings, completedListings]);
 
   // Listen for localStorage changes (cross-tab) and merge sources when storage updates
   useEffect(() => {
@@ -409,14 +413,14 @@ const ProfilePage = () => {
               <div className="text-slate-400">DSwap done</div>
             </motion.div>
             <motion.div whileHover={{ y: -4 }} className="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 p-6 text-center backdrop-blur-xl">
-              <div className="text-3xl font-semibold text-white mb-2">{totalListings + completedListings}</div>
+              <div className="text-3xl font-semibold text-white mb-2">{createdListingsCount > 0 ? createdListingsCount : totalListings + completedListings}</div>
               <div className="text-slate-400">Total Listings</div>
             </motion.div>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-8 backdrop-blur-xl">
             <h3 className="text-xl font-semibold text-white mb-6">Recent Activity</h3>
-            <div className="space-y-3 max-h-[28rem] overflow-y-auto pr-2">
+            <div className="space-y-3 max-h-[28rem] overflow-y-auto pr-2 recent-activity-scroll">
               {recentActivity.length === 0 ? (
                 <p className="text-slate-300 text-center py-8">No recent activity yet. Complete or delete a listing to see your activity here.</p>
               ) : (
@@ -424,8 +428,8 @@ const ProfilePage = () => {
                   <div key={activity.id} className="rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-4 text-sm text-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${activity.type === 'completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-rose-500/10 text-rose-300'}`}>
-                          {activity.type === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Trash2 className="h-5 w-5" />}
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${activity.type === 'completed' ? 'bg-emerald-400/10 text-emerald-300' : activity.type === 'deleted' ? 'bg-rose-500/10 text-rose-300' : 'bg-sky-400/10 text-sky-300'}`}>
+                          {activity.type === 'completed' ? <CheckCircle className="h-5 w-5" /> : activity.type === 'deleted' ? <Trash2 className="h-5 w-5" /> : <PlusCircle className="h-5 w-5" />}
                         </div>
                         <div>
                           <p className="font-semibold text-white">{activity.title}</p>

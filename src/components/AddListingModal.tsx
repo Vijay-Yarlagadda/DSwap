@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, MapPin, Phone, AlertCircle } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
-import { addListing, getUserData } from '../services/firestoreService.js';
+import { addListing, addActivity, getUserData } from '../services/firestoreService.js';
 import { DEPARTMENTS } from '../constants/departments';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -12,6 +12,8 @@ interface AddListingModalProps {
 }
 
 const LOCATION_OPTIONS = ['Block A', 'Block B', 'Block C', 'Library', 'Lakeview', 'Cuisine'] as const;
+
+const STORAGE_KEY = 'dswap_recent_activity';
 
 const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalProps) => {
   const { currentUser } = useAuth();
@@ -52,6 +54,28 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
     autoFillUserData();
   }, [isOpen, currentUser]);
 
+  const saveCreatedActivity = async (listingId: string) => {
+    if (!listingId || !currentUser) return;
+
+    const activity = {
+      id: `created-${listingId}-${Date.now()}`,
+      type: 'created',
+      title: 'Listing created',
+      description: `${parseInt(formData.amount)} ₹ • ${formData.location}`,
+      timestamp: Math.floor(Date.now() / 1000),
+    };
+
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const existing = raw ? JSON.parse(raw) : [];
+      const next = [activity, ...(Array.isArray(existing) ? existing : [])].slice(0, 8);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      await addActivity(currentUser.uid, activity);
+    } catch (error) {
+      console.error('Failed to save created activity:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -69,13 +93,15 @@ const AddListingModal = ({ isOpen, onClose, onListingAdded }: AddListingModalPro
     setIsLoading(true);
 
     try {
-      await addListing(currentUser.uid, {
+      const listingId = await addListing(currentUser.uid, {
         name: formData.name,
         department: formData.department,
         phone: formData.phone,
         location: formData.location,
         amount: parseInt(formData.amount),
       });
+
+      await saveCreatedActivity(listingId);
 
       setFormData({
         amount: '',

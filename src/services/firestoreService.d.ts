@@ -23,6 +23,7 @@ export interface Listing extends ListingData {
 export function saveUserData(uid: string, userData: Partial<UserData>): Promise<void>;
 export function getUserData(uid: string): Promise<UserData | null>;
 export function addListing(uid: string, listingData: ListingData): Promise<string>;
+export function addActivity(uid: string, activity: { id?: string; type: string; title: string; description: string; timestamp?: number }): Promise<string>;
 export function getListings(filters?: { location?: string }): Promise<Listing[]>;
 export function updateListingAmount(listingId: string, amount: number): Promise<void>;
 export function deleteListing(listingId: string): Promise<void>;
