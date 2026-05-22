@@ -2,6 +2,7 @@ import { User, Clock, Phone, Trash2, MoreVertical, Edit, CheckCircle } from 'luc
 import { useState, useRef, useEffect, memo } from 'react';
 import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
+import ContactModal from './ContactModal';
 
 const LOCATION_STYLE_MAP: Record<string, { dot: string; badge: string }> = {
   'Block A': {
@@ -57,6 +58,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   const [isEditing, setIsEditing] = useState(false);
   const [editAmount, setEditAmount] = useState(listing.amount.toString());
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const saveDeletedActivity = () => {
@@ -164,7 +166,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
 
   const handleContact = () => {
     if (listing.phone) {
-      window.location.href = `tel:${listing.phone}`;
+      setShowContactModal(true);
     }
   };
 
@@ -310,6 +312,13 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
           <span className="relative">Contact {listing.phone}</span>
         </button>
       </div>
+
+      <ContactModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        phone={listing.phone}
+        name={listing.name}
+      />
     </motion.div>
   );
 };
