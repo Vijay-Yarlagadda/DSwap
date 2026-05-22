@@ -59,11 +59,12 @@ interface ListingCardProps {
   onListingDeleted?: () => void;
   onListingCompleted?: () => void;
   onListingEdited?: () => void;
+  colorOverride?: { dot: string; badge: string } | null;
 }
 
 const STORAGE_KEY = 'dswap_recent_activity';
 
-const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingEdited }: ListingCardProps) => {
+const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingEdited, colorOverride }: ListingCardProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -231,10 +232,17 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
                   <span className="bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-400 bg-clip-text text-transparent">₹</span>{listing.amount}
                 </h3>
               </div>
-              <div className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold shadow-[0_0_16px_rgba(0,0,0,0.12)] backdrop-blur-sm leading-none ${LOCATION_STYLE_MAP[listing.location]?.badge || 'border-sky-400/20 text-sky-100 bg-sky-950/40'}`}>
-                <span className={`flex h-1.5 w-1.5 rounded-full ${LOCATION_STYLE_MAP[listing.location]?.dot || 'bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)]'} animate-pulse`} />
-                <span className="tracking-wide uppercase">{listing.location}</span>
-              </div>
+              {(() => {
+                const style = colorOverride ?? LOCATION_STYLE_MAP[listing.location];
+                const badgeClass = style?.badge ?? 'border-sky-400/20 text-sky-100 bg-sky-950/40';
+                const dotClass = style?.dot ?? 'bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.35)]';
+                return (
+                  <div className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold shadow-[0_0_16px_rgba(0,0,0,0.12)] backdrop-blur-sm leading-none ${badgeClass}`}>
+                    <span className={`flex h-1.5 w-1.5 rounded-full ${dotClass} animate-pulse`} />
+                    <span className="tracking-wide uppercase">{listing.location}</span>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

@@ -42,6 +42,14 @@ const DashboardPage = () => {
 
   const filters = ['All', 'Block A', 'Block B', 'Block C', 'Library', 'Lakeview', 'Cuisine'];
 
+  // Color cycle: start with Yellow, then Red, then Blue, then Violet
+  const COLOR_CYCLE = [
+    { dot: 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.35)]', badge: 'border-yellow-400/20 text-yellow-100' },
+    { dot: 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.35)]', badge: 'border-red-500/20 text-red-100' },
+    { dot: 'bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.35)]', badge: 'border-blue-400/20 text-blue-100' },
+    { dot: 'bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.35)]', badge: 'border-violet-400/20 text-violet-100' },
+  ];
+
   const loadListings = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -156,6 +164,7 @@ const DashboardPage = () => {
                     onListingDeleted={loadListings}
                     onListingCompleted={loadListings}
                     onListingEdited={loadListings}
+                    colorOverride={COLOR_CYCLE[index % COLOR_CYCLE.length]}
                   />
                 </motion.div>
               ))}
