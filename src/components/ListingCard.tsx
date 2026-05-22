@@ -29,6 +29,18 @@ const LOCATION_STYLE_MAP: Record<string, { dot: string; badge: string }> = {
     dot: 'bg-rose-400 shadow-[0_0_10px_rgba(251,113,133,0.35)]',
     badge: 'border-rose-400/20 text-rose-100',
   },
+  Red: {
+    dot: 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.35)]',
+    badge: 'border-red-500/20 text-red-100',
+  },
+  Yellow: {
+    dot: 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.35)]',
+    badge: 'border-yellow-400/20 text-yellow-100',
+  },
+  Green: {
+    dot: 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.35)]',
+    badge: 'border-green-500/20 text-green-100',
+  },
 };
 
 interface Listing {

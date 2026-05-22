@@ -1,4 +1,4 @@
-import { MessageCircle, Phone, X } from 'lucide-react';
+import { MessageCircle, Phone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ContactModalProps {
@@ -48,17 +48,9 @@ const ContactModal = ({ isOpen, onClose, phone, name }: ContactModalProps) => {
             style={{ willChange: 'transform' }}
           >
             {/* Header */}
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold text-white">Contact {name}</h2>
-                <p className="text-sm text-slate-400">{phone}</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-slate-300"
-              >
-                <X className="h-5 w-5" />
-              </button>
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-white">Contact {name}</h2>
+              <p className="text-sm text-slate-400">{phone}</p>
             </div>
 
             {/* Divider */}
