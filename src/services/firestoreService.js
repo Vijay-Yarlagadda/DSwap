@@ -6,6 +6,7 @@ import {
   getDoc,
   getDocs,
   query,
+  orderBy,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -258,26 +259,44 @@ export const addActivity = async (uid, activity) => {
       type: activity.type,
       title: activity.title,
       description: activity.description,
-      timestamp: serverTimestamp(),
+      timestamp: Math.floor(Date.now() / 1000),
+      createdAt: serverTimestamp(),
     };
-    await addDoc(collection(db, ACTIVITIES_COLLECTION), payload);
+    const docRef = await addDoc(collection(db, ACTIVITIES_COLLECTION), payload);
+    console.log('Activity saved to Firestore successfully:', docRef.id, activity.type);
+    return docRef.id;
   } catch (error) {
-    console.error('Failed to add activity:', error);
+    console.error('Failed to add activity to Firestore:', error);
+    throw error;
   }
 };
 
 export const subscribeToUserActivities = (uid, callback) => {
   try {
     const activitiesRef = collection(db, ACTIVITIES_COLLECTION);
-    const q = query(activitiesRef, where('userId', '==', uid));
+    const q = query(
+      activitiesRef,
+      where('userId', '==', uid),
+      orderBy('timestamp', 'desc')
+    );
+
+    console.log('Setting up activities subscription for user:', uid);
+
     return onSnapshot(q, (snapshot) => {
       const activities = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      console.log('Activities subscription received:', activities.length, 'items');
+      activities.forEach((a, i) => {
+        console.log(`  ${i + 1}. ${a.title} - ${a.type} (${a.timestamp?.seconds || a.timestamp})`);
+      });
       callback(activities);
     }, (error) => {
       console.error('Error in activities subscription:', error);
+      callback([]); // Return empty array on error instead of silent failure
     });
   } catch (error) {
     console.error('subscribeToUserActivities error:', error);
+    // Return a callback that immediately calls the provided callback with empty array
+    setTimeout(() => callback([]), 0);
     return () => {};
   }
 };

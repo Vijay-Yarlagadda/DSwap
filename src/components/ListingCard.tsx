@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import ContactModal from './ContactModal';
 import { useAuth } from '../hooks/useAuth';
 
+const { deleteListing, completeListing, updateListingAmount } = (fireService as any);
+
 const LOCATION_STYLE_MAP: Record<string, { dot: string; badge: string }> = {
   'Block A': {
     dot: 'bg-cyan-400 shadow-[0_0_10px_rgba(56,189,248,0.35)]',
@@ -91,13 +93,18 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       };
       const next = [activity, ...(Array.isArray(existing) ? existing : [])].slice(0, 8);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      console.log('Deleted activity saved to localStorage');
+      
       // Also persist activity to Firestore so it appears on other devices
-      try {
-        if (currentUser && (currentUser as any).uid) {
-          (fireService as any).addActivity((currentUser as any).uid, activity).catch(() => {});
-        }
-      } catch (err) {
-        // ignore auth errors here
+      if (currentUser && (currentUser as any).uid) {
+        (fireService as any).addActivity((currentUser as any).uid, activity)
+          .then(() => {
+            console.log('Deleted activity successfully saved to Firestore');
+          })
+          .catch((err: any) => {
+            console.error('Failed to save deleted activity to Firestore:', err);
+            // Activity is still in localStorage, so it will show on this device
+          });
       }
     } catch (err) {
       console.error('Failed to save deleted activity', err);

@@ -26,8 +26,17 @@ interface ActivityItem {
 
 const STORAGE_KEY = 'dswap_recent_activity';
 
-const formatActivityDate = (timestamp: number) => {
-  const date = new Date(timestamp * 1000);
+const formatActivityDate = (timestamp: number | { seconds?: number; toDate?: () => Date }) => {
+  let seconds = 0;
+  if (typeof timestamp === 'number') {
+    seconds = timestamp;
+  } else if (timestamp?.seconds) {
+    seconds = timestamp.seconds;
+  } else if (typeof timestamp?.toDate === 'function') {
+    seconds = Math.floor(timestamp.toDate().getTime() / 1000);
+  }
+
+  const date = new Date(seconds * 1000);
   return date.toLocaleString(undefined, {
     month: 'short',
     day: 'numeric',
@@ -40,10 +49,16 @@ const loadStoredActivity = (): ActivityItem[] => {
   if (typeof window === 'undefined') return [];
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return [];
+    if (!saved) {
+      console.log('No stored activities found in localStorage');
+      return [];
+    }
     const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
+    const result = Array.isArray(parsed) ? parsed : [];
+    console.log('Loaded stored activities from localStorage:', result.length);
+    return result;
+  } catch (err) {
+    console.error('Error loading stored activities from localStorage:', err);
     return [];
   }
 };
@@ -90,17 +105,26 @@ const ProfilePage = () => {
       let unsubscribeActivities = () => {};
       if (typeof subscribeToUserActivities === 'function') {
         unsubscribeActivities = subscribeToUserActivities(currentUser.uid, (activities: any[]) => {
+          if (!Array.isArray(activities)) {
+            console.warn('subscribeToUserActivities returned non-array:', activities);
+            return;
+          }
           const mapped = activities
             .map((a) => ({
               id: a.id,
               type: a.type as ActivityItem['type'],
               title: a.title,
               description: a.description,
-              timestamp: a.timestamp?.seconds || Math.floor(Date.now() / 1000),
+              timestamp: typeof a.timestamp === 'number'
+                ? a.timestamp
+                : a.timestamp?.seconds || Math.floor(Date.now() / 1000),
             }))
             .sort((a, b) => b.timestamp - a.timestamp);
+          console.log('Firestore activities loaded:', mapped.length, 'items');
           setFirestoreActivities(mapped);
         }) || (() => {});
+      } else {
+        console.warn('subscribeToUserActivities function not found');
       }
       
       return () => {
@@ -114,25 +138,39 @@ const ProfilePage = () => {
   // Whenever any source updates, merge stored + firestoreActivities + completedActivitiesState
   useEffect(() => {
     const stored = loadStoredActivity();
-    const merged = [...stored, ...firestoreActivities, ...completedActivitiesState];
-    const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
+    const allActivities = [...stored, ...firestoreActivities, ...completedActivitiesState];
+    
+    console.log('Merging activities - Stored:', stored.length, 'Firestore:', firestoreActivities.length, 'Completed:', completedActivitiesState.length);
+    
+    const unique = allActivities.reduce<Record<string, ActivityItem>>((acc, item) => {
       acc[item.id] = item;
       return acc;
     }, {} as Record<string, ActivityItem>);
-    setRecentActivity(Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+    
+    const sorted = Object.values(unique).sort((a, b) => b.timestamp - a.timestamp);
+    
+    console.log('Final unique activities:', sorted.length);
+    sorted.forEach((a, i) => {
+      console.log(`  ${i + 1}. ${a.title} - ${a.type}`);
+    });
+    
+    setRecentActivity(sorted.slice(0, 10));
   }, [firestoreActivities, completedActivitiesState]);
 
   // Listen for localStorage changes (cross-tab) and merge sources when storage updates
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (!e.key || e.key === STORAGE_KEY) {
+        console.log('Storage event detected - refreshing activities');
         const stored = loadStoredActivity();
         const merged = [...stored, ...firestoreActivities, ...completedActivitiesState];
         const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
           acc[item.id] = item;
           return acc;
         }, {} as Record<string, ActivityItem>);
-        setRecentActivity(Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+        const sorted = Object.values(unique).sort((a, b) => b.timestamp - a.timestamp);
+        console.log('Activities after storage update:', sorted.length);
+        setRecentActivity(sorted.slice(0, 10));
       }
     };
 
