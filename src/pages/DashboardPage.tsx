@@ -92,7 +92,15 @@ const DashboardPage = () => {
           <div className="pointer-events-none absolute left-8 top-8 h-24 w-24 rounded-full bg-blue-500/8 blur-2xl opacity-90" />
 
           <p className="mb-4 text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold">Browse by location</p>
-          <FilterChips filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+          <motion.div
+            key={`filter-${activeFilter}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            style={{ willChange: 'opacity, transform' }}
+          >
+            <FilterChips filters={filters} activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+          </motion.div>
         </div>
 
         {isLoading ? (
@@ -122,20 +130,26 @@ const DashboardPage = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeFilter}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
               className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+              style={{ willChange: 'opacity, transform' }}
             >
-              {listings.map((listing) => (
+              {listings.map((listing, index) => (
                 <motion.div
                   key={listing.id}
                   layout
-                  initial={{ opacity: 0, y: 12 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ 
+                    duration: 0.22, 
+                    ease: 'easeOut',
+                    delay: index * 0.02
+                  }}
+                  style={{ willChange: 'auto' }}
                 >
                   <ListingCard
                     listing={listing}
