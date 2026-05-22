@@ -1,6 +1,6 @@
 import { User, Clock, Phone, Trash2, MoreVertical, Edit, CheckCircle } from 'lucide-react';
 import { useState, useRef, useEffect, memo } from 'react';
-import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
+import * as fireService from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
 import ContactModal from './ContactModal';
 import { useAuth } from '../hooks/useAuth';
@@ -94,13 +94,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       // Also persist activity to Firestore so it appears on other devices
       try {
         if (currentUser && (currentUser as any).uid) {
-          import('../services/firestoreService.js').then((m: any) => {
-            try {
-              m.addActivity((currentUser as any).uid, activity);
-            } catch (e) {
-              // ignore
-            }
-          }).catch(() => {});
+          (fireService as any).addActivity((currentUser as any).uid, activity).catch(() => {});
         }
       } catch (err) {
         // ignore auth errors here

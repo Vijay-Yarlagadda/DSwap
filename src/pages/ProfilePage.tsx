@@ -3,7 +3,8 @@ import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle,
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
-import { getUserData, updateUserProfile, subscribeToUserListings, subscribeToCompletedListings } from '../services/firestoreService.js';
+import * as fireService from '../services/firestoreService.js';
+const { getUserData, updateUserProfile, subscribeToUserListings, subscribeToCompletedListings, subscribeToUserActivities } = (fireService as any);
 import { motion } from 'framer-motion';
 
 interface UserProfile {
@@ -87,23 +88,20 @@ const ProfilePage = () => {
         // merge with stored and firestore activities below via effect
       });
       let unsubscribeActivities = () => {};
-      // dynamic import to avoid static type issues in JS module analysis
-      import('../services/firestoreService.js').then((m: any) => {
-        if (m && (m as any).subscribeToUserActivities) {
-          unsubscribeActivities = (m as any).subscribeToUserActivities(currentUser.uid, (activities: any[]) => {
-            const mapped = activities
-              .map((a) => ({
-                id: a.id,
-                type: a.type as ActivityItem['type'],
-                title: a.title,
-                description: a.description,
-                timestamp: a.timestamp?.seconds || Math.floor(Date.now() / 1000),
-              }))
-              .sort((a, b) => b.timestamp - a.timestamp);
-            setFirestoreActivities(mapped);
-          }) || (() => {});
-        }
-      }).catch(() => {});
+      if (typeof subscribeToUserActivities === 'function') {
+        unsubscribeActivities = subscribeToUserActivities(currentUser.uid, (activities: any[]) => {
+          const mapped = activities
+            .map((a) => ({
+              id: a.id,
+              type: a.type as ActivityItem['type'],
+              title: a.title,
+              description: a.description,
+              timestamp: a.timestamp?.seconds || Math.floor(Date.now() / 1000),
+            }))
+            .sort((a, b) => b.timestamp - a.timestamp);
+          setFirestoreActivities(mapped);
+        }) || (() => {});
+      }
       
       return () => {
         unsubscribeActive();
@@ -122,6 +120,24 @@ const ProfilePage = () => {
       return acc;
     }, {} as Record<string, ActivityItem>);
     setRecentActivity(Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+  }, [firestoreActivities, completedActivitiesState]);
+
+  // Listen for localStorage changes (cross-tab) and merge sources when storage updates
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (!e.key || e.key === STORAGE_KEY) {
+        const stored = loadStoredActivity();
+        const merged = [...stored, ...firestoreActivities, ...completedActivitiesState];
+        const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
+          acc[item.id] = item;
+          return acc;
+        }, {} as Record<string, ActivityItem>);
+        setRecentActivity(Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+      }
+    };
+
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [firestoreActivities, completedActivitiesState]);
 
   const loadUserProfile = async () => {
