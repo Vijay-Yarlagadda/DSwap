@@ -6,7 +6,6 @@ import {
   getDoc,
   getDocs,
   query,
-  orderBy,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -274,11 +273,7 @@ export const addActivity = async (uid, activity) => {
 export const subscribeToUserActivities = (uid, callback) => {
   try {
     const activitiesRef = collection(db, ACTIVITIES_COLLECTION);
-    const q = query(
-      activitiesRef,
-      where('userId', '==', uid),
-      orderBy('timestamp', 'desc')
-    );
+    const q = query(activitiesRef, where('userId', '==', uid));
 
     console.log('Setting up activities subscription for user:', uid);
 
