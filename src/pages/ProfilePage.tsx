@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut, Package } from 'lucide-react';
+import { User, Building, Phone, Mail, Edit, CheckCircle, ArrowLeft, AlertCircle, LogOut, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
@@ -59,6 +59,8 @@ const ProfilePage = () => {
   const [totalListings, setTotalListings] = useState(0);
   const [completedListings, setCompletedListings] = useState(0);
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([]);
+  const [firestoreActivities, setFirestoreActivities] = useState<ActivityItem[]>([]);
+  const [completedActivitiesState, setCompletedActivitiesState] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
     loadUserProfile();
@@ -81,23 +83,46 @@ const ProfilePage = () => {
           }))
           .sort((a, b) => b.timestamp - a.timestamp);
 
-        setRecentActivity(() => {
-          const stored = loadStoredActivity();
-          const merged = [...stored, ...completedActivities];
-          const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
-            acc[item.id] = item;
-            return acc;
-          }, {} as Record<string, ActivityItem>);
-          return Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6);
-        });
+        setCompletedActivitiesState(completedActivities);
+        // merge with stored and firestore activities below via effect
       });
+      let unsubscribeActivities = () => {};
+      // dynamic import to avoid static type issues in JS module analysis
+      import('../services/firestoreService.js').then((m: any) => {
+        if (m && (m as any).subscribeToUserActivities) {
+          unsubscribeActivities = (m as any).subscribeToUserActivities(currentUser.uid, (activities: any[]) => {
+            const mapped = activities
+              .map((a) => ({
+                id: a.id,
+                type: a.type as ActivityItem['type'],
+                title: a.title,
+                description: a.description,
+                timestamp: a.timestamp?.seconds || Math.floor(Date.now() / 1000),
+              }))
+              .sort((a, b) => b.timestamp - a.timestamp);
+            setFirestoreActivities(mapped);
+          }) || (() => {});
+        }
+      }).catch(() => {});
       
       return () => {
         unsubscribeActive();
         unsubscribeCompleted();
+        unsubscribeActivities();
       };
     }
   }, [currentUser]);
+
+  // Whenever any source updates, merge stored + firestoreActivities + completedActivitiesState
+  useEffect(() => {
+    const stored = loadStoredActivity();
+    const merged = [...stored, ...firestoreActivities, ...completedActivitiesState];
+    const unique = merged.reduce<Record<string, ActivityItem>>((acc, item) => {
+      acc[item.id] = item;
+      return acc;
+    }, {} as Record<string, ActivityItem>);
+    setRecentActivity(Object.values(unique).sort((a, b) => b.timestamp - a.timestamp).slice(0, 6));
+  }, [firestoreActivities, completedActivitiesState]);
 
   const loadUserProfile = async () => {
     if (!currentUser) return;
@@ -344,12 +369,12 @@ const ProfilePage = () => {
                   <div key={activity.id} className="rounded-3xl border border-white/10 bg-slate-950/80 px-4 py-4 text-sm text-slate-200 shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${activity.type === 'completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-rose-400/10 text-rose-300'}`}>
-                          {activity.type === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Package className="h-5 w-5" />}
+                        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${activity.type === 'completed' ? 'bg-emerald-400/10 text-emerald-300' : 'bg-rose-500/10 text-rose-300'}`}>
+                          {activity.type === 'completed' ? <CheckCircle className="h-5 w-5" /> : <Trash2 className="h-5 w-5" />}
                         </div>
                         <div>
                           <p className="font-semibold text-white">{activity.title}</p>
-                          <p className="text-slate-400">{activity.description}</p>
+                          <p className="text-slate-300">{activity.description}</p>
                         </div>
                       </div>
                       <span className="text-xs text-slate-500">{formatActivityDate(activity.timestamp)}</span>

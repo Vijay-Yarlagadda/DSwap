@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, memo } from 'react';
 import { deleteListing, completeListing, updateListingAmount } from '../services/firestoreService.js';
 import { motion } from 'framer-motion';
 import ContactModal from './ContactModal';
+import { useAuth } from '../hooks/useAuth';
 
 const LOCATION_STYLE_MAP: Record<string, { dot: string; badge: string }> = {
   'Block A': {
@@ -73,6 +74,7 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
   const [isUpdating, setIsUpdating] = useState(false);
   const [showContactModal, setShowContactModal] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { currentUser } = useAuth();
 
   const saveDeletedActivity = () => {
     if (!listing.id) return;
@@ -89,6 +91,20 @@ const ListingCard = ({ listing, onListingDeleted, onListingCompleted, onListingE
       };
       const next = [activity, ...(Array.isArray(existing) ? existing : [])].slice(0, 8);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      // Also persist activity to Firestore so it appears on other devices
+      try {
+        if (currentUser && (currentUser as any).uid) {
+          import('../services/firestoreService.js').then((m: any) => {
+            try {
+              m.addActivity((currentUser as any).uid, activity);
+            } catch (e) {
+              // ignore
+            }
+          }).catch(() => {});
+        }
+      } catch (err) {
+        // ignore auth errors here
+      }
     } catch (err) {
       console.error('Failed to save deleted activity', err);
     }

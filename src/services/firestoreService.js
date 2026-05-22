@@ -247,3 +247,37 @@ export const fetchCompletedListings = async (uid) => {
     throw formatFirestoreError(error, 'Failed to load completed listings.');
   }
 };
+
+// Activities collection for cross-device recent activity
+const ACTIVITIES_COLLECTION = 'activities';
+
+export const addActivity = async (uid, activity) => {
+  try {
+    const payload = {
+      userId: uid,
+      type: activity.type,
+      title: activity.title,
+      description: activity.description,
+      timestamp: serverTimestamp(),
+    };
+    await addDoc(collection(db, ACTIVITIES_COLLECTION), payload);
+  } catch (error) {
+    console.error('Failed to add activity:', error);
+  }
+};
+
+export const subscribeToUserActivities = (uid, callback) => {
+  try {
+    const activitiesRef = collection(db, ACTIVITIES_COLLECTION);
+    const q = query(activitiesRef, where('userId', '==', uid));
+    return onSnapshot(q, (snapshot) => {
+      const activities = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      callback(activities);
+    }, (error) => {
+      console.error('Error in activities subscription:', error);
+    });
+  } catch (error) {
+    console.error('subscribeToUserActivities error:', error);
+    return () => {};
+  }
+};
