@@ -3,7 +3,6 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  getAdditionalUserInfo,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import type { FirebaseError } from 'firebase/app';
@@ -74,13 +73,11 @@ export const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    const additionalUserInfo = getAdditionalUserInfo(result);
-    const isNewUser = additionalUserInfo?.isNewUser ?? false;
 
     // Save or update user in Firestore
     await saveUserToFirestore(user);
 
-    return { user, isNewUser };
+    return user;
   } catch (error) {
     console.error('Google sign-in error:', error);
 

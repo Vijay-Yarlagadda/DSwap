@@ -68,15 +68,11 @@ const AuthForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      const { isNewUser } = await signInWithGoogle();
+      await signInWithGoogle();
 
       setIsSuccess(true);
       setTimeout(() => {
-        if (isNewUser) {
-          navigate('/complete-profile');
-        } else {
-          navigate('/dashboard');
-        }
+        navigate('/dashboard');
       }, 550);
     } catch (error) {
       const fallbackError = 'Google sign-in failed. Please try again.';

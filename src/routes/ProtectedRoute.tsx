@@ -25,13 +25,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       setProfileChecking(true);
       try {
         const userData = await getUserData(currentUser.uid);
+        const isGoogleUser = currentUser.providerData?.some(
+          (provider) => provider.providerId === 'google.com'
+        );
         const isComplete = !!userData?.department && !!userData?.phone;
         if (active) {
-          setProfileComplete(isComplete);
+          setProfileComplete(isComplete || Boolean(isGoogleUser));
         }
       } catch {
         if (active) {
-          setProfileComplete(false);
+          setProfileComplete(Boolean(currentUser.providerData?.some(
+            (provider) => provider.providerId === 'google.com'
+          )));
         }
       } finally {
         if (active) {
