@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User } from 'lucide-react';
+import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
 import { signup, login, signInWithGoogle } from '../services/authService';
 import { getUserData } from '../services/firestoreService.js';
@@ -17,6 +17,7 @@ const AuthForm = () => {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -202,7 +203,7 @@ const AuthForm = () => {
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-300" />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   name="password"
                   placeholder=" "
                   className={inputClassName}
@@ -211,6 +212,14 @@ const AuthForm = () => {
                   autoComplete="new-password"
                 />
                 <label className={getLabelClassName(password.length > 0)}>Password</label>
+                <button
+                  type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300/90 hover:text-slate-100"
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
               </div>
 
               <motion.button
