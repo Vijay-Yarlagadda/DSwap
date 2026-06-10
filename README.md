@@ -39,6 +39,26 @@ Start the development server:
 npm run dev
 ```
 
+## Firebase setup
+
+This app requires Firebase configuration values to be available as Vite environment variables.
+
+1. Open Firebase Console and select your project.
+2. Go to Project Settings → General.
+3. Scroll to Your apps and locate the Firebase SDK configuration.
+4. Copy these values into Vercel environment variables or a local `.env` file:
+   - `VITE_FIREBASE_API_KEY`
+   - `VITE_FIREBASE_AUTH_DOMAIN`
+   - `VITE_FIREBASE_PROJECT_ID`
+   - `VITE_FIREBASE_STORAGE_BUCKET`
+   - `VITE_FIREBASE_MESSAGING_SENDER_ID`
+   - `VITE_FIREBASE_APP_ID`
+
+5. In Firebase Console, open Authentication → Settings → Authorized domains.
+6. Add your deployed Vercel domain, for example `your-app-name.vercel.app`.
+
+If you do not add these values, the app will fail with a Firebase config error.
+
 ## Build
 
 Build for production:
