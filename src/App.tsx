@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './style.css';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './routes/ProtectedRoute';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const AuthPage = lazy(() => import('./pages/AuthPage'));
 const DashboardPage = lazy(() => import('./pages/DashboardPage'));
@@ -12,16 +13,17 @@ const CompleteProfilePage = lazy(() => import('./pages/CompleteProfilePage'));
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen">
-          <Suspense
-            fallback={
-              <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
-                Loading...
-              </div>
-            }
-          >
-            <Routes>
+      <ErrorBoundary>
+        <Router>
+          <div className="min-h-screen">
+            <Suspense
+              fallback={
+                <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
+                  Loading...
+                </div>
+              }
+            >
+              <Routes>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/" element={<Navigate to="/auth" replace />} />
               <Route
@@ -52,7 +54,8 @@ function App() {
           </Suspense>
         </div>
       </Router>
-    </AuthProvider>
+    </ErrorBoundary>
+  </AuthProvider>
   );
 }
 
