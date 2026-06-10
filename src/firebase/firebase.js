@@ -25,56 +25,11 @@ if (!hasFirebaseConfig) {
   );
 }
 
-let firebaseApp;
-let authInstance;
-let dbInstance;
+// Initialize Firebase app
+const app = initializeApp(firebaseConfig);
 
-// Lazy initialize Firebase app
-function getFirebaseApp() {
-  if (!firebaseApp) {
-    try {
-      firebaseApp = initializeApp(firebaseConfig);
-    } catch (error) {
-      // Firebase app already initialized in some cases
-      console.debug('Firebase app initialization:', error);
-    }
-  }
-  return firebaseApp;
-}
-
-// Lazy get Auth instance
-export function getAuthInstance() {
-  try {
-    if (!authInstance) {
-      const app = getFirebaseApp();
-      authInstance = getAuth(app);
-    }
-    return authInstance;
-  } catch (error) {
-    console.error('Error getting auth instance:', error);
-    throw new Error('Failed to initialize authentication');
-  }
-}
-
-// Lazy get Firestore instance
-export function getDbInstance() {
-  try {
-    if (!dbInstance) {
-      const app = getFirebaseApp();
-      dbInstance = getFirestore(app);
-    }
-    return dbInstance;
-  } catch (error) {
-    console.error('Error getting database instance:', error);
-    throw new Error('Failed to initialize database');
-  }
-}
-
-// Initialize Firebase app immediately
-const app = getFirebaseApp();
-
-// Export instances for backward compatibility
-export const auth = getAuthInstance();
-export const db = getDbInstance();
+// Initialize Auth and Firestore
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export default app;

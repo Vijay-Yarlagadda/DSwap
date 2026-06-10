@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff, Check } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
-import { signup, login, signInWithGoogle, getGoogleRedirectResult, isAuthRequestInProgress } from '../services/authService';
+import { useAuth } from '../hooks/useAuth';
+import { signup, login, signInWithGoogle, isAuthRequestInProgress } from '../services/authService';
 
 const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
 
 const AuthForm = () => {
+  const { currentUser, loading: authLoading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,53 +22,23 @@ const AuthForm = () => {
   const [statusMessage, setStatusMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isCheckingRedirect, setIsCheckingRedirect] = useState(true);
   const navigate = useNavigate();
 
-  // Handle Google Sign-In redirect result on page load
+  // Auto-redirect when user is authenticated via redirect
   useEffect(() => {
-    let mounted = true;
-
-    const handleGoogleRedirect = async () => {
-      try {
-        setIsCheckingRedirect(true);
-        
-        // Check if there's a redirect result from Google Sign-In
-        const result = await getGoogleRedirectResult();
-        
-        if (mounted && result?.user) {
-          const { isNewUser } = result;
-          
-          // Set success state and redirect
-          if (isNewUser && typeof window !== 'undefined') {
-            localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
-          }
-
-          setIsSuccess(true);
-          setStatusMessage('Signed in successfully. Redirecting...');
-          
-          setTimeout(() => {
-            if (mounted) {
-              navigate(isNewUser ? '/complete-profile' : '/dashboard');
-            }
-          }, 600);
-        }
-      } catch (error) {
-        // Silently handle redirect check errors - most of the time there's no redirect result
-        console.debug('No redirect result to handle');
-      } finally {
-        if (mounted) {
-          setIsCheckingRedirect(false);
-        }
+    if (currentUser && !isLoading && !authLoading) {
+      // Check if this is a new user from Google redirect
+      const isNewUser = localStorage.getItem(GOOGLE_SIGNUP_STORAGE_KEY) === 'true';
+      
+      if (isNewUser) {
+        localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+        navigate('/complete-profile');
+      } else if (!isSignUp) {
+        // Only auto-redirect if we're in sign-in mode (not sign-up)
+        navigate('/dashboard');
       }
-    };
-
-    handleGoogleRedirect();
-
-    return () => {
-      mounted = false;
-    };
-  }, [navigate]);
+    }
+  }, [currentUser, authLoading, isLoading, navigate, isSignUp]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,32 +157,6 @@ const AuthForm = () => {
         ? 'top-4 translate-y-0 text-sm opacity-0'
         : 'top-1/2 -translate-y-1/2 text-base peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-sm peer-focus:opacity-0'
     } peer-focus:text-primary-200`;
-
-  // Show loading state while checking for redirect
-  if (isCheckingRedirect) {
-    return (
-      <motion.div
-        className="w-full max-w-md"
-        initial={{ opacity: 0, y: 28 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 shadow-[0_30px_70px_rgba(2,6,23,0.45)] backdrop-blur-xl md:p-8">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-80" />
-          <div className="relative flex min-h-[400px] items-center justify-center">
-            <div className="flex flex-col items-center gap-4">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                className="h-8 w-8 rounded-full border-2 border-white/20 border-t-primary-400"
-              />
-              <p className="text-sm text-slate-300">Initializing authentication...</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div
@@ -407,7 +353,7 @@ const AuthForm = () => {
 
           {/* Status messages */}
           <AnimatePresence>
-            {statusMessage && !authError && (
+            {statusMessage && !authError && !isGoogleLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
