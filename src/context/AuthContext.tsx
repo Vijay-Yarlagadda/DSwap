@@ -2,8 +2,14 @@ import React, { createContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { User } from 'firebase/auth';
 import { auth } from '../firebase/firebase.js';
-import { onAuthStateChanged, signOut, getRedirectResult } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  signOut,
+  getRedirectResult,
+  getAdditionalUserInfo,
+} from 'firebase/auth';
 import { saveUserData } from '../services/firestoreService.js';
+import { GOOGLE_SIGNUP_STORAGE_KEY } from '../services/authService';
 
 interface AuthContextType {
   currentUser: User | null;
@@ -43,16 +49,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (redirectResult && redirectResult.user) {
               console.debug('Redirect result found, user:', redirectResult.user.email);
               const user = redirectResult.user;
-              // Save user data to Firestore if it's a new user
-              try {
-                await saveUserData(user.uid, {
-                  email: user.email ?? '',
-                  name: user.displayName || '',
-                  department: '',
-                  phone: '',
-                });
-              } catch (err) {
-                console.debug('Error saving redirect user to Firestore:', err);
+              const isNewUser = getAdditionalUserInfo(redirectResult)?.isNewUser ?? false;
+              if (isNewUser) {
+                try {
+                  await saveUserData(user.uid, {
+                    email: user.email ?? '',
+                    name: user.displayName || '',
+                    department: '',
+                    phone: '',
+                  });
+                } catch (err) {
+                  console.debug('Error saving redirect user to Firestore:', err);
+                }
+                if (typeof window !== 'undefined') {
+                  window.localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+                }
+              } else if (typeof window !== 'undefined') {
+                window.localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
               }
               setCurrentUser(user);
               setError(null);
@@ -113,6 +126,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = React.useCallback(async () => {
     try {
       setError(null);
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+      }
       await signOut(auth);
       setCurrentUser(null);
     } catch (error) {

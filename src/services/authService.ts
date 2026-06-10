@@ -12,6 +12,20 @@ import type { FirebaseError } from 'firebase/app';
 import { auth } from '../firebase/firebase.js';
 import { saveUserData } from './firestoreService.js';
 
+export const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
+
+const isMobileBrowser = () =>
+  typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+const storeGoogleSignupFlag = (isNewUser: boolean) => {
+  if (typeof window === 'undefined') return;
+  if (isNewUser) {
+    window.localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+  } else {
+    window.localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+  }
+};
+
 interface SignupData {
   email: string;
   password: string;
@@ -72,14 +86,6 @@ class AuthRequestSemaphore {
 
 const authSemaphore = new AuthRequestSemaphore();
 
-const MOBILE_USER_AGENT_REGEX = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
-
-// Detect if device is mobile
-const isMobileDevice = () => {
-  if (typeof navigator === 'undefined') return false;
-  return MOBILE_USER_AGENT_REGEX.test(navigator.userAgent);
-};
-
 // Check online status with more reliable method
 const isOnline = (): boolean => {
   if (typeof navigator === 'undefined') return true;
@@ -110,16 +116,6 @@ const isRetryableNetworkError = (error: unknown) => {
     code === 'auth/network-request-failed' ||
     code === 'auth/timeout' ||
     code === 'auth/too-many-requests'
-  );
-};
-
-// Check if error is a temporary popup issue
-const isTemporaryPopupError = (error: unknown) => {
-  const code = (error as any)?.code;
-  return (
-    code === 'auth/popup-blocked' ||
-    code === 'auth/popup-closed-by-user' ||
-    code === 'auth/cancelled-popup-request'
   );
 };
 
@@ -267,7 +263,7 @@ export const login = async (data: LoginData): Promise<User> => {
   });
 };
 
-// Sign in with Google (device-aware, with comprehensive error handling)
+// Sign in with Google (popup on desktop, redirect on mobile)
 export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
   return authSemaphore.execute(async () => {
     if (!isOnline()) {
@@ -275,44 +271,49 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
     }
 
     const provider = new GoogleAuthProvider();
-    const mobile = isMobileDevice();
-    
-    // Improve popup behavior
     provider.setCustomParameters({
       prompt: 'select_account',
       access_type: 'online',
     });
 
+    const useRedirect = isMobileBrowser();
+
     try {
-      // Use redirect on mobile, popup on desktop
-      if (mobile) {
-        // Mobile: Always use redirect
+      if (useRedirect) {
         await signInWithRedirect(auth, provider);
         return { redirect: true };
-      } else {
-        // Desktop: Try popup first
-        try {
-          const result = await signInWithPopup(auth, provider);
-          const user = result.user;
-          const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
-          await saveUserToFirestore(user);
-          return { user, isNewUser };
-        } catch (popupError) {
-          // If popup fails with temporary errors, try redirect fallback
-          if (isTemporaryPopupError(popupError)) {
-            console.debug('Popup failed, falling back to redirect:', (popupError as any)?.code);
-            try {
-              await signInWithRedirect(auth, provider);
-              return { redirect: true };
-            } catch (redirectError) {
-              // If both fail, throw the original popup error
-              throw popupError;
-            }
-          }
-          throw popupError;
+      }
+
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+      const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
+
+      if (isNewUser) {
+        await saveUserData(user.uid, {
+          email: user.email ?? '',
+          name: user.displayName || '',
+          department: '',
+          phone: '',
+        });
+      }
+
+      storeGoogleSignupFlag(isNewUser);
+      return { user, isNewUser, redirect: false };
+    } catch (error) {
+      const firebaseError = error as FirebaseError;
+      if (!useRedirect && firebaseError?.code) {
+        const fallbackRedirectCodes = [
+          'auth/popup-blocked',
+          'auth/cancelled-popup-request',
+          'auth/operation-not-supported-in-this-environment',
+        ];
+
+        if (fallbackRedirectCodes.includes(firebaseError.code)) {
+          await signInWithRedirect(auth, provider);
+          return { redirect: true };
         }
       }
-    } catch (error) {
+
       console.error('Google sign-in error:', error);
       throw normalizeError(error);
     }
@@ -331,7 +332,17 @@ export const getGoogleRedirectResult = async (): Promise<GoogleSignInResult | nu
     if (result && result.user) {
       const user = result.user;
       const isNewUser = getAdditionalUserInfo(result)?.isNewUser ?? false;
-      await saveUserToFirestore(user);
+      if (isNewUser) {
+        await saveUserData(user.uid, {
+          email: user.email ?? '',
+          name: user.displayName || '',
+          department: '',
+          phone: '',
+        });
+        storeGoogleSignupFlag(true);
+      } else {
+        storeGoogleSignupFlag(false);
+      }
       return { user, isNewUser };
     }
     return null;

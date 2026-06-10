@@ -4,9 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff, Check } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
 import { useAuth } from '../hooks/useAuth';
-import { signup, login, signInWithGoogle, isAuthRequestInProgress } from '../services/authService';
-
-const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
+import { signup, login, signInWithGoogle, isAuthRequestInProgress, GOOGLE_SIGNUP_STORAGE_KEY } from '../services/authService';
 
 const AuthForm = () => {
   const { currentUser, loading: authLoading } = useAuth();
@@ -111,32 +109,24 @@ const AuthForm = () => {
 
     try {
       setStatusMessage('Connecting to Google...');
-      
       const result = await signInWithGoogle();
-      
-      // If redirect is needed (mobile or popup blocked), the function returns with redirect: true
+
       if (result.redirect) {
         setStatusMessage('Redirecting to Google... Please wait.');
-        // Don't need to do anything - Firebase will handle the redirect
         return;
       }
 
-      // Popup sign-in was successful
       if (result.user) {
-        const { isNewUser } = result;
-        
-        if (isNewUser && typeof window !== 'undefined') {
-          localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+        setIsGoogleLoading(false);
+        if (result.isNewUser && typeof window !== 'undefined') {
+          window.localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+          navigate('/complete-profile');
+        } else {
+          navigate('/dashboard');
         }
-
-        setIsSuccess(true);
-        setStatusMessage('Signed in successfully. Redirecting...');
-        
-        setTimeout(() => {
-          navigate(isNewUser ? '/complete-profile' : '/dashboard');
-        }, 600);
       }
     } catch (error) {
+      setIsGoogleLoading(false);
       const fallbackError = 'Google sign-in failed. Please try again.';
       if (error instanceof Error) {
         setAuthError(error.message || fallbackError);
@@ -144,8 +134,6 @@ const AuthForm = () => {
         setAuthError(fallbackError);
       }
       setStatusMessage('');
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
 
