@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
 import { signup, login, signInWithGoogle } from '../services/authService';
-import { getUserData } from '../services/firestoreService.js';
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -69,7 +68,7 @@ const AuthForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      const { user, isNewUser } = await signInWithGoogle();
+      const { isNewUser } = await signInWithGoogle();
 
       setIsSuccess(true);
       setTimeout(() => {
