@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, ArrowRight, Building, Lock, Mail, Phone, User, Eye, EyeOff, Check } from 'lucide-react';
 import { DEPARTMENTS } from '../constants/departments';
-import { signup, login, signInWithGoogle } from '../services/authService';
+import { signup, login, signInWithGoogle, getGoogleRedirectResult, isAuthRequestInProgress } from '../services/authService';
+
+const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -15,13 +17,67 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isCheckingRedirect, setIsCheckingRedirect] = useState(true);
   const navigate = useNavigate();
+
+  // Handle Google Sign-In redirect result on page load
+  useEffect(() => {
+    let mounted = true;
+
+    const handleGoogleRedirect = async () => {
+      try {
+        setIsCheckingRedirect(true);
+        
+        // Check if there's a redirect result from Google Sign-In
+        const result = await getGoogleRedirectResult();
+        
+        if (mounted && result?.user) {
+          const { isNewUser } = result;
+          
+          // Set success state and redirect
+          if (isNewUser && typeof window !== 'undefined') {
+            localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+          }
+
+          setIsSuccess(true);
+          setStatusMessage('Signed in successfully. Redirecting...');
+          
+          setTimeout(() => {
+            if (mounted) {
+              navigate(isNewUser ? '/complete-profile' : '/dashboard');
+            }
+          }, 600);
+        }
+      } catch (error) {
+        // Silently handle redirect check errors - most of the time there's no redirect result
+        console.debug('No redirect result to handle');
+      } finally {
+        if (mounted) {
+          setIsCheckingRedirect(false);
+        }
+      }
+    };
+
+    handleGoogleRedirect();
+
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple simultaneous requests
+    if (isLoading || isAuthRequestInProgress()) {
+      return;
+    }
+
     setAuthError('');
+    setStatusMessage('');
     setIsLoading(true);
 
     try {
@@ -30,6 +86,8 @@ const AuthForm = () => {
         if (!name || !email || !password || !phone || !department) {
           throw new Error('Please fill in all fields');
         }
+        
+        setStatusMessage('Creating your account...');
         
         await signup({
           email,
@@ -43,6 +101,9 @@ const AuthForm = () => {
         if (!email || !password) {
           throw new Error('Please enter email and password');
         }
+        
+        setStatusMessage('Signing you in...');
+        
         await login({
           email,
           password,
@@ -50,7 +111,9 @@ const AuthForm = () => {
       }
 
       setIsSuccess(true);
-      setTimeout(() => navigate('/dashboard'), 550);
+      setStatusMessage('Success! Redirecting to dashboard...');
+      
+      setTimeout(() => navigate('/dashboard'), 600);
     } catch (error) {
       const fallbackError = isSignUp ? 'Sign up failed. Please try again.' : 'Sign in failed. Please try again.';
       if (error instanceof Error) {
@@ -58,31 +121,49 @@ const AuthForm = () => {
       } else {
         setAuthError(fallbackError);
       }
+      setStatusMessage('');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
+  const handleGoogleSignIn = async () => {
+    // Prevent multiple simultaneous requests
+    if (isGoogleLoading || isAuthRequestInProgress()) {
+      return;
+    }
 
-const handleGoogleSignIn = async () => {
     setAuthError('');
+    setStatusMessage('');
     setIsGoogleLoading(true);
 
     try {
-      const { isNewUser } = await signInWithGoogle();
-      if (isNewUser && typeof window !== 'undefined') {
-        localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+      setStatusMessage('Connecting to Google...');
+      
+      const result = await signInWithGoogle();
+      
+      // If redirect is needed (mobile or popup blocked), the function returns with redirect: true
+      if (result.redirect) {
+        setStatusMessage('Redirecting to Google... Please wait.');
+        // Don't need to do anything - Firebase will handle the redirect
+        return;
       }
 
-      setIsSuccess(true);
-      setTimeout(() => {
-        if (isNewUser) {
-          navigate('/complete-profile');
-        } else {
-          navigate('/dashboard');
+      // Popup sign-in was successful
+      if (result.user) {
+        const { isNewUser } = result;
+        
+        if (isNewUser && typeof window !== 'undefined') {
+          localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
         }
-      }, 550);
+
+        setIsSuccess(true);
+        setStatusMessage('Signed in successfully. Redirecting...');
+        
+        setTimeout(() => {
+          navigate(isNewUser ? '/complete-profile' : '/dashboard');
+        }, 600);
+      }
     } catch (error) {
       const fallbackError = 'Google sign-in failed. Please try again.';
       if (error instanceof Error) {
@@ -90,6 +171,7 @@ const handleGoogleSignIn = async () => {
       } else {
         setAuthError(fallbackError);
       }
+      setStatusMessage('');
     } finally {
       setIsGoogleLoading(false);
     }
@@ -104,13 +186,39 @@ const handleGoogleSignIn = async () => {
         : 'top-1/2 -translate-y-1/2 text-base peer-focus:top-3 peer-focus:translate-y-0 peer-focus:text-sm peer-focus:opacity-0'
     } peer-focus:text-primary-200`;
 
+  // Show loading state while checking for redirect
+  if (isCheckingRedirect) {
+    return (
+      <motion.div
+        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 shadow-[0_30px_70px_rgba(2,6,23,0.45)] backdrop-blur-xl md:p-8">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-80" />
+          <div className="relative flex min-h-[400px] items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                className="h-8 w-8 rounded-full border-2 border-white/20 border-t-primary-400"
+              />
+              <p className="text-sm text-slate-300">Initializing authentication...</p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
       className="w-full max-w-md"
       initial={{ opacity: 0, y: 28 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -3 }}
+      whileHover={!isSuccess ? { y: -3 } : {}}
     >
       <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 shadow-[0_30px_70px_rgba(2,6,23,0.45)] backdrop-blur-xl md:p-8">
         <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-80" />
@@ -123,8 +231,10 @@ const handleGoogleSignIn = async () => {
               onClick={() => {
                 setIsSignUp((current) => !current);
                 setAuthError('');
+                setStatusMessage('');
               }}
-              className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-white/10"
+              disabled={isLoading || isGoogleLoading || isSuccess}
+              className="rounded-full border border-white/20 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSignUp ? 'Switch to sign in' : 'Switch to sign up'}
             </motion.button>
@@ -153,6 +263,7 @@ const handleGoogleSignIn = async () => {
                       value={name}
                       onChange={(event) => setName(event.target.value)}
                       autoComplete="off"
+                      disabled={isLoading || isSuccess}
                     />
                     <label className={getLabelClassName(name.length > 0)}>Full name</label>
                   </div>
@@ -163,6 +274,7 @@ const handleGoogleSignIn = async () => {
                       className={`${inputClassName} appearance-none`}
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
+                      disabled={isLoading || isSuccess}
                     >
                       <option value="">Select Department</option>
                       {DEPARTMENTS.map((dept) => (
@@ -183,6 +295,7 @@ const handleGoogleSignIn = async () => {
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
                       autoComplete="off"
+                      disabled={isLoading || isSuccess}
                     />
                     <label className={getLabelClassName(phone.length > 0)}>Phone number</label>
                   </div>
@@ -199,6 +312,7 @@ const handleGoogleSignIn = async () => {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   autoComplete="off"
+                  disabled={isLoading || isSuccess}
                 />
                 <label className={getLabelClassName(email.length > 0)}>Email address</label>
               </div>
@@ -213,13 +327,15 @@ const handleGoogleSignIn = async () => {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="new-password"
+                  disabled={isLoading || isSuccess}
                 />
                 <label className={getLabelClassName(password.length > 0)}>Password</label>
                 <button
                   type="button"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300/90 hover:text-slate-100"
+                  disabled={isLoading || isSuccess}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300/90 hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
@@ -227,13 +343,31 @@ const handleGoogleSignIn = async () => {
 
               <motion.button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || isSuccess}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 py-3 font-medium text-white shadow-[0_14px_30px_rgba(37,99,235,0.45)] transition disabled:opacity-70 disabled:cursor-not-allowed"
-                whileHover={{ scale: isLoading ? 1 : 1.01 }}
-                whileTap={{ scale: isLoading ? 1 : 0.98 }}
+                whileHover={{ scale: isLoading || isSuccess ? 1 : 1.01 }}
+                whileTap={{ scale: isLoading || isSuccess ? 1 : 0.98 }}
               >
-                {isLoading ? 'Processing...' : isSignUp ? 'Create account' : 'Sign in'}
-                {!isLoading && <ArrowRight className="h-4 w-4" />}
+                {isLoading ? (
+                  <>
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                      className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white"
+                    />
+                    <span>Processing...</span>
+                  </>
+                ) : isSuccess ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    <span>Success!</span>
+                  </>
+                ) : (
+                  <>
+                    {isSignUp ? 'Create account' : 'Sign in'}
+                    <ArrowRight className="h-4 w-4" />
+                  </>
+                )}
               </motion.button>
             </motion.form>
           </AnimatePresence>
@@ -247,14 +381,52 @@ const handleGoogleSignIn = async () => {
           <motion.button
             type="button"
             onClick={handleGoogleSignIn}
-            disabled={isGoogleLoading}
-            whileHover={{ scale: isGoogleLoading ? 1 : 1.01 }}
-            whileTap={{ scale: isGoogleLoading ? 1 : 0.99 }}
+            disabled={isGoogleLoading || isLoading || isSuccess}
+            whileHover={{ scale: !isGoogleLoading && !isLoading && !isSuccess ? 1.01 : 1 }}
+            whileTap={{ scale: !isGoogleLoading && !isLoading && !isSuccess ? 0.99 : 1 }}
             className="w-full rounded-xl border border-white/25 bg-white/5 py-3 font-medium text-slate-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isGoogleLoading ? 'Opening Google...' : 'Continue with Google'}
+            {isGoogleLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                  className="h-4 w-4 rounded-full border-2 border-slate-100/30 border-t-slate-100"
+                />
+                Connecting...
+              </span>
+            ) : isSuccess ? (
+              <span className="flex items-center justify-center gap-2">
+                <Check className="h-4 w-4" />
+                Complete
+              </span>
+            ) : (
+              'Continue with Google'
+            )}
           </motion.button>
 
+          {/* Status messages */}
+          <AnimatePresence>
+            {statusMessage && !authError && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mt-4 rounded-xl border border-blue-300/40 bg-blue-500/10 px-4 py-3 text-sm text-blue-200"
+              >
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                    className="h-3 w-3 rounded-full border border-blue-400/40 border-t-blue-300"
+                  />
+                  {statusMessage}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Error messages */}
           <AnimatePresence>
             {authError ? (
               <motion.div
@@ -269,15 +441,17 @@ const handleGoogleSignIn = async () => {
             ) : null}
           </AnimatePresence>
 
+          {/* Success message */}
           <AnimatePresence>
-            {isSuccess ? (
+            {isSuccess && !authError ? (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                className="mt-4 rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200"
+                className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200"
               >
-                Authentication successful. Redirecting to dashboard...
+                <Check className="h-4 w-4 shrink-0" />
+                <span>{statusMessage || 'Authentication successful. Redirecting...'}</span>
               </motion.div>
             ) : null}
           </AnimatePresence>
