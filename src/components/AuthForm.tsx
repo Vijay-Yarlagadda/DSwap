@@ -69,12 +69,11 @@ const AuthForm = () => {
     setIsGoogleLoading(true);
 
     try {
-      const user = await signInWithGoogle();
-      const profile = await getUserData(user.uid);
+      const { user, isNewUser } = await signInWithGoogle();
 
       setIsSuccess(true);
       setTimeout(() => {
-        if (!profile?.department || !profile?.phone) {
+        if (isNewUser) {
           navigate('/complete-profile');
         } else {
           navigate('/dashboard');
