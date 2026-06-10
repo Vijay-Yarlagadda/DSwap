@@ -6,6 +6,8 @@ import { useAuth } from '../hooks/useAuth';
 import { DEPARTMENTS } from '../constants/departments';
 import { getUserData, updateUserProfile } from '../services/firestoreService.js';
 
+const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
+
 const CompleteProfilePage = () => {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
@@ -62,6 +64,9 @@ const CompleteProfilePage = () => {
         department,
         phone,
       });
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+      }
       navigate('/dashboard');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to save profile';

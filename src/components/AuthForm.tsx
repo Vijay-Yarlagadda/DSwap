@@ -63,16 +63,25 @@ const AuthForm = () => {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
+
+const handleGoogleSignIn = async () => {
     setAuthError('');
     setIsGoogleLoading(true);
 
     try {
-      await signInWithGoogle();
+      const { isNewUser } = await signInWithGoogle();
+      if (isNewUser && typeof window !== 'undefined') {
+        localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
+      }
 
       setIsSuccess(true);
       setTimeout(() => {
-        navigate('/dashboard');
+        if (isNewUser) {
+          navigate('/complete-profile');
+        } else {
+          navigate('/dashboard');
+        }
       }, 550);
     } catch (error) {
       const fallbackError = 'Google sign-in failed. Please try again.';
