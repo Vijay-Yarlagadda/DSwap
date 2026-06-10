@@ -88,6 +88,14 @@ export const signInWithGoogle = async () => {
       );
     }
 
+    if (firebaseError.code === 'auth/popup-closed-by-user') {
+      throw new Error('Google sign-in was cancelled. Please try again if you want to sign in.');
+    }
+
+    if (firebaseError.code === 'auth/cancelled-popup-request') {
+      throw new Error('Google sign-in was cancelled or interrupted. Please try again.');
+    }
+
     throw error;
   }
 };
