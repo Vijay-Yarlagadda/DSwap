@@ -5,6 +5,7 @@ import {
   GoogleAuthProvider,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
+import type { FirebaseError } from 'firebase/app';
 import { auth } from '../firebase/firebase.js';
 import { saveUserData } from './firestoreService.js';
 
@@ -79,6 +80,14 @@ export const signInWithGoogle = async () => {
     return user;
   } catch (error) {
     console.error('Google sign-in error:', error);
+
+    const firebaseError = error as FirebaseError;
+    if (firebaseError.code === 'auth/unauthorized-domain') {
+      throw new Error(
+        'Firebase auth blocked this domain. Add your Vercel domain to Firebase Authentication > Authorized domains.'
+      );
+    }
+
     throw error;
   }
 };
