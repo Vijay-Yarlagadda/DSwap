@@ -14,8 +14,6 @@ import { saveUserData } from './firestoreService.js';
 
 export const GOOGLE_SIGNUP_STORAGE_KEY = 'dswap_google_signup';
 
-const isMobileBrowser = () =>
-  typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
 const storeGoogleSignupFlag = (isNewUser: boolean) => {
   if (typeof window === 'undefined') return;
@@ -265,24 +263,24 @@ export const login = async (data: LoginData): Promise<User> => {
 
 // Sign in with Google (popup on desktop, redirect on mobile)
 export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
-  return authSemaphore.execute(async () => {
-    if (!isOnline()) {
-      throw new Error('offline');
+  if (!isOnline()) {
+    throw new Error('offline');
+  }
+
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    prompt: 'select_account',
+    access_type: 'online',
+  });
+
+  // Prefer popup even on mobile to avoid cross-origin redirect issues (ITP)
+  const useRedirect = false;
+
+  try {
+    if (useRedirect) {
+      await signInWithRedirect(auth, provider);
+      return { redirect: true };
     }
-
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: 'select_account',
-      access_type: 'online',
-    });
-
-    const useRedirect = isMobileBrowser();
-
-    try {
-      if (useRedirect) {
-        await signInWithRedirect(auth, provider);
-        return { redirect: true };
-      }
 
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
@@ -317,7 +315,6 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
       console.error('Google sign-in error:', error);
       throw normalizeError(error);
     }
-  });
 };
 
 // Handle Google Sign-In redirect result (call this on app load/auth page load)

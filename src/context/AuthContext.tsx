@@ -73,7 +73,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
               }
-              return; // Exit early, auth state listener will handle subsequent updates
             }
           } catch (redirectErr) {
             console.debug('Error checking redirect result:', redirectErr);
