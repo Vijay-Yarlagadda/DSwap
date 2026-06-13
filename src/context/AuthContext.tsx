@@ -73,9 +73,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
               }
+            } else {
+              console.debug('No Google redirect result found; continuing with auth state listener.');
             }
           } catch (redirectErr) {
-            console.debug('Error checking redirect result:', redirectErr);
+            console.error('Error checking redirect result:', redirectErr);
+            setError('Google redirect sign-in failed. Please try again.');
+            setLoading(false);
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
+            }
+            return;
           }
         }
 

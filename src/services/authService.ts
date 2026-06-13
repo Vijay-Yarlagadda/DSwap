@@ -262,11 +262,15 @@ export const login = async (data: LoginData): Promise<User> => {
 };
 
 const isMobileDevice = (): boolean => {
-  if (typeof navigator === 'undefined') return false;
-  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
+  const userAgent = navigator.userAgent || '';
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+  const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
+  const isSmallViewport = window.innerWidth <= 768;
+  return isMobileUA || hasTouch || isSmallViewport;
 };
 
-// Sign in with Google (popup on desktop, redirect on mobile)
+// Sign in with Google (popup on desktop, redirect on mobile or small screens)
 export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
   if (!isOnline()) {
     throw new Error('offline');
