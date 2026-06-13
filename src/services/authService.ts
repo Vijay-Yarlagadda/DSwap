@@ -261,6 +261,11 @@ export const login = async (data: LoginData): Promise<User> => {
   });
 };
 
+const isMobileDevice = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+};
+
 // Sign in with Google (popup on desktop, redirect on mobile)
 export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
   if (!isOnline()) {
@@ -273,8 +278,7 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
     access_type: 'online',
   });
 
-  // Prefer popup even on mobile to avoid cross-origin redirect issues (ITP)
-  const useRedirect = false;
+  const useRedirect = isMobileDevice();
 
   try {
     if (useRedirect) {
@@ -282,40 +286,41 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
       return { redirect: true };
     }
 
-      const userCredential = await signInWithPopup(auth, provider);
-      const user = userCredential.user;
-      const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
+    const userCredential = await signInWithPopup(auth, provider);
+    const user = userCredential.user;
+    const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
 
-      if (isNewUser) {
-        await saveUserData(user.uid, {
-          email: user.email ?? '',
-          name: user.displayName || '',
-          department: '',
-          phone: '',
-        });
-      }
-
-      storeGoogleSignupFlag(isNewUser);
-      return { user, isNewUser, redirect: false };
-    } catch (error) {
-      const firebaseError = error as FirebaseError;
-      if (!useRedirect && firebaseError?.code) {
-        const fallbackRedirectCodes = [
-          'auth/popup-blocked',
-          'auth/cancelled-popup-request',
-          'auth/operation-not-supported-in-this-environment',
-        ];
-
-        if (fallbackRedirectCodes.includes(firebaseError.code)) {
-          await signInWithRedirect(auth, provider);
-          return { redirect: true };
-        }
-      }
-
-      console.error('Google sign-in error:', error);
-      throw normalizeError(error);
+    if (isNewUser) {
+      await saveUserData(user.uid, {
+        email: user.email ?? '',
+        name: user.displayName || '',
+        department: '',
+        phone: '',
+      });
     }
+
+    storeGoogleSignupFlag(isNewUser);
+    return { user, isNewUser, redirect: false };
+  } catch (error) {
+    const firebaseError = error as FirebaseError;
+    if (!useRedirect && firebaseError?.code) {
+      const fallbackRedirectCodes = [
+        'auth/popup-blocked',
+        'auth/cancelled-popup-request',
+        'auth/operation-not-supported-in-this-environment',
+      ];
+
+      if (fallbackRedirectCodes.includes(firebaseError.code)) {
+        await signInWithRedirect(auth, provider);
+        return { redirect: true };
+      }
+    }
+
+    console.error('Google sign-in error:', error);
+    throw normalizeError(error);
+  }
 };
+
 
 // Handle Google Sign-In redirect result (call this on app load/auth page load)
 export const getGoogleRedirectResult = async (): Promise<GoogleSignInResult | null> => {
