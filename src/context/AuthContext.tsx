@@ -33,99 +33,82 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const redirectProcessedRef = useRef(false);
 
   useEffect(() => {
-    // Set a timeout to force completion of auth state check
-    timeoutRef.current = setTimeout(() => {
-      console.debug('Auth initialization timeout, forcing completion');
-      setLoading(false);
-    }, 10000); // Increased to 10s to handle redirect flow
+    let mounted = true;
+    console.debug('[AuthContext] Setting up Auth listener...');
 
-    const initializeAuth = async () => {
+    // We don't set a hard timeout anymore because onAuthStateChanged handles the initial load immediately.
+    // However, if getRedirectResult takes a while, we want to let it finish.
+
+    const checkRedirect = async () => {
       try {
-        // First, check for redirect result from Google Sign-In (mobile)
-        if (!redirectProcessedRef.current) {
-          redirectProcessedRef.current = true;
-          try {
-            const redirectResult = await getRedirectResult(auth);
-            if (redirectResult && redirectResult.user) {
-              console.debug('Redirect result found, user:', redirectResult.user.email);
-              const user = redirectResult.user;
-              const isNewUser = getAdditionalUserInfo(redirectResult)?.isNewUser ?? false;
-              if (isNewUser) {
-                try {
-                  await saveUserData(user.uid, {
-                    email: user.email ?? '',
-                    name: user.displayName || '',
-                    department: '',
-                    phone: '',
-                  });
-                } catch (err) {
-                  console.debug('Error saving redirect user to Firestore:', err);
-                }
-                if (typeof window !== 'undefined') {
-                  window.localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
-                }
-              } else if (typeof window !== 'undefined') {
-                window.localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+        console.debug('[AuthContext] Checking redirect result...');
+        const redirectResult = await getRedirectResult(auth);
+        
+        if (redirectResult && redirectResult.user) {
+          console.debug('[AuthContext] Redirect result found, user:', redirectResult.user.email);
+          const user = redirectResult.user;
+          const isNewUser = getAdditionalUserInfo(redirectResult)?.isNewUser ?? false;
+          
+          if (isNewUser) {
+            try {
+              await saveUserData(user.uid, {
+                email: user.email ?? '',
+                name: user.displayName || '',
+                department: '',
+                phone: '',
+              });
+              if (typeof window !== 'undefined') {
+                window.localStorage.setItem(GOOGLE_SIGNUP_STORAGE_KEY, 'true');
               }
-              setCurrentUser(user);
-              setError(null);
-              setLoading(false);
-              if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-              }
-            } else {
-              console.debug('No Google redirect result found; continuing with auth state listener.');
+            } catch (err) {
+              console.debug('[AuthContext] Error saving redirect user to Firestore:', err);
             }
-          } catch (redirectErr) {
-            console.error('Error checking redirect result:', redirectErr);
-            setError('Google redirect sign-in failed. Please try again.');
-            setLoading(false);
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-            return;
+          } else if (typeof window !== 'undefined') {
+            window.localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
           }
+          // We DO NOT call setCurrentUser here!
+          // We let onAuthStateChanged handle the state update to prevent race conditions.
+        } else {
+          console.debug('[AuthContext] No Google redirect result found.');
         }
-
-        // Set up auth state listener
-        unsubscribeRef.current = onAuthStateChanged(
-          auth,
-          (user) => {
-            setCurrentUser(user);
-            setLoading(false);
-            setError(null);
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-          },
-          (authError) => {
-            console.error('Auth state error:', authError);
-            setError(authError?.message || 'Authentication check failed');
-            setLoading(false);
-            if (timeoutRef.current) {
-              clearTimeout(timeoutRef.current);
-            }
-          }
-        );
-      } catch (error) {
-        console.error('Auth provider setup error:', error);
-        setError(error instanceof Error ? error.message : 'Failed to initialize authentication');
-        setLoading(false);
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
+      } catch (redirectErr) {
+        console.error('[AuthContext] Error checking redirect result:', redirectErr);
+        if (mounted) {
+          setError('Google redirect sign-in failed. Please try again.');
         }
       }
     };
 
-    initializeAuth();
+    // Check for redirect immediately, but don't await it to block onAuthStateChanged
+    checkRedirect();
+
+    // Set up auth state listener immediately
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        console.debug('[AuthContext] Auth state changed. User:', user ? user.email : 'null');
+        if (mounted) {
+          setCurrentUser(user);
+          setLoading(false);
+          setError(null);
+        }
+      },
+      (authError) => {
+        console.error('[AuthContext] Auth state error:', authError);
+        if (mounted) {
+          setError(authError?.message || 'Authentication check failed');
+          setLoading(false);
+        }
+      }
+    );
+
+    unsubscribeRef.current = unsubscribe;
 
     // Cleanup function
     return () => {
+      mounted = false;
       if (unsubscribeRef.current) {
         unsubscribeRef.current();
-      }
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
       }
     };
   }, []);

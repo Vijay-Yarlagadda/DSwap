@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -31,5 +31,10 @@ const app = initializeApp(firebaseConfig);
 // Initialize Auth and Firestore
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Explicitly set persistence to local to ensure sessions survive redirects on mobile
+setPersistence(auth, browserLocalPersistence).catch((err) => {
+  console.error('[Firebase] Failed to set auth persistence:', err);
+});
 
 export default app;

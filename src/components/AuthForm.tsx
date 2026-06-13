@@ -24,16 +24,22 @@ const AuthForm = () => {
 
   // Auto-redirect when user is authenticated via redirect
   useEffect(() => {
+    console.debug(`[AuthForm] Auth state check - currentUser: ${currentUser?.email || 'null'}, isLoading: ${isLoading}, authLoading: ${authLoading}, isSignUp: ${isSignUp}`);
     if (currentUser && !isLoading && !authLoading) {
       // Check if this is a new user from Google redirect
       const isNewUser = localStorage.getItem(GOOGLE_SIGNUP_STORAGE_KEY) === 'true';
+      console.debug(`[AuthForm] Authenticated! isNewUser: ${isNewUser}`);
       
       if (isNewUser) {
         localStorage.removeItem(GOOGLE_SIGNUP_STORAGE_KEY);
+        console.debug('[AuthForm] Navigating to /complete-profile');
         navigate('/complete-profile');
       } else if (!isSignUp) {
         // Only auto-redirect if we're in sign-in mode (not sign-up)
+        console.debug('[AuthForm] Navigating to /dashboard');
         navigate('/dashboard');
+      } else {
+         console.debug('[AuthForm] isSignUp is true, skipping auto-redirect (user should complete signup flow or manually navigate)');
       }
     }
   }, [currentUser, authLoading, isLoading, navigate, isSignUp]);

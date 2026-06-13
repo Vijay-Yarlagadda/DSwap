@@ -25,7 +25,7 @@ function App() {
             >
               <Routes>
               <Route path="/auth" element={<AuthPage />} />
-              <Route path="/" element={<Navigate to="/auth" replace />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route
                 path="/dashboard"
                 element={
