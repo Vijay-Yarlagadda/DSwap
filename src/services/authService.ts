@@ -261,16 +261,8 @@ export const login = async (data: LoginData): Promise<User> => {
   });
 };
 
-const isMobileDevice = (): boolean => {
-  if (typeof navigator === 'undefined' || typeof window === 'undefined') return false;
-  const userAgent = navigator.userAgent || '';
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || (navigator as any).msMaxTouchPoints > 0;
-  const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(userAgent);
-  const isSmallViewport = window.innerWidth <= 768;
-  return isMobileUA || hasTouch || isSmallViewport;
-};
 
-// Sign in with Google (popup on desktop, redirect on mobile or small screens)
+// Sign in with Google (popup by default, fallback to redirect if blocked)
 export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
   if (!isOnline()) {
     throw new Error('offline');
@@ -282,14 +274,7 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
     access_type: 'online',
   });
 
-  const useRedirect = isMobileDevice();
-
   try {
-    if (useRedirect) {
-      await signInWithRedirect(auth, provider);
-      return { redirect: true };
-    }
-
     const userCredential = await signInWithPopup(auth, provider);
     const user = userCredential.user;
     const isNewUser = getAdditionalUserInfo(userCredential)?.isNewUser ?? false;
@@ -307,13 +292,14 @@ export const signInWithGoogle = async (): Promise<GoogleSignInResult> => {
     return { user, isNewUser, redirect: false };
   } catch (error) {
     const firebaseError = error as FirebaseError;
-    if (!useRedirect && firebaseError?.code) {
+    if (firebaseError?.code) {
       const fallbackRedirectCodes = [
         'auth/popup-blocked',
         'auth/cancelled-popup-request',
         'auth/operation-not-supported-in-this-environment',
       ];
 
+      // Fallback to redirect ONLY if popup fails or is blocked
       if (fallbackRedirectCodes.includes(firebaseError.code)) {
         await signInWithRedirect(auth, provider);
         return { redirect: true };
