@@ -23,9 +23,18 @@
     "lucide-react": "^1.14.0",
     "react-router-dom": "^7.15.0"
   },
-  "description": "A modern, responsive frontend-only web application for campus-based digital cash exchange.",
+  "description": "A secure document and cash exchange platform for campus communities with real-time Firestore integration.",
   "main": "postcss.config.js",
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "cash-exchange",
+    "document-management",
+    "campus",
+    "peer-to-peer",
+    "firebase",
+    "react",
+    "typescript",
+    "vercel"
+  ],
+  "author": "Your Name <your.email@example.com> (https://github.com/yourusername)",
+  "license": "MIT"
 }
