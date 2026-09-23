@@ -10,10 +10,11 @@ A modern, secure, and fully responsive web application for campus-based digital 
 
 ### 🔐 **Authentication & Security**
 
-- **Google OAuth 2.0 Integration**: Secure single sign-on with Google
+- **Google Sign-In**: Secure authentication with Google OAuth
+- **Email and Password Authentication**: Account registration and sign-in with Firebase Authentication
 - **Split-Layout Auth UI**: Professional sign-in and sign-up interface
 - **Session Management**: Secure token handling and automatic session persistence
-- **Protected Routes**: Role-based access control for authenticated users
+- **Protected Routes**: Restricts dashboard and profile pages to authenticated users
 - **Network-Resilient Auth**: Exponential backoff retry logic with graceful fallbacks
 
 ### 💼 **Dashboard & Listings**
@@ -102,7 +103,7 @@ A modern, secure, and fully responsive web application for campus-based digital 
 - **Node.js**: Version 20.19+ or 22.12+
 - **npm** or **yarn**: Package manager
 - **Firebase Project**: Created at [firebase.google.com](https://firebase.google.com)
-- **Google Cloud Project**: For OAuth 2.0 credentials
+- **Google Cloud Project**: Required when enabling Google sign-in through Firebase
 
 ---
 
@@ -128,7 +129,7 @@ npm install
 1. Go to [Firebase Console](https://console.firebase.google.com)
 2. Create a new project named "DSwap"
 3. Enable Firestore Database in test mode (configure security rules later)
-4. Enable Firebase Authentication with Google provider
+4. Enable Firebase Authentication with both **Email/Password** and **Google** providers
 
 #### Step 2: Get Firebase Credentials
 
@@ -320,9 +321,10 @@ DSwap/
 
 ### Authentication
 
-- **OAuth 2.0**: Secure Google authentication
+- **Google OAuth**: Secure Google authentication with popup and redirect fallback
+- **Email/Password**: Firebase-managed account creation and sign-in
 - **Session Tokens**: Handled securely by Firebase
-- **Protected Routes**: Authenticated routes require valid user session
+- **Protected Routes**: Dashboard and profile routes require a valid user session
 - **Type Safety**: TypeScript prevents many security vulnerabilities
 
 ### Database Security
@@ -389,11 +391,12 @@ DSwap/
 
 ### Authentication Fails
 
-**Issue**: "Failed to authenticate with Google"
+**Issue**: "Authentication failed"
 
-- **Solution**: Check Firebase Console → Authentication → Authorized domains
+- **Solution**: Check Firebase Console → Authentication → Sign-in method and confirm that Email/Password and Google providers are enabled
+- For Google sign-in, check Firebase Console → Authentication → Authorized domains
 - Clear browser cache and cookies
-- Verify Google OAuth credentials are correct
+- Verify the email, password, and Google OAuth configuration are correct
 
 ### Listings Not Loading
 
