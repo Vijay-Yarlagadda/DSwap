@@ -4,7 +4,7 @@ import FilterChips from '../components/FilterChips';
 import ListingCard from '../components/ListingCard';
 import AddListingModal from '../components/AddListingModal';
 import { useAuth } from '../hooks/useAuth';
-import { getListings } from '../services/firestoreService.js';
+import { subscribeToActiveListings } from '../services/firestoreService.js';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Listing {
@@ -50,30 +50,25 @@ const DashboardPage = () => {
     { dot: 'bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.35)]', badge: 'border-violet-400/20 text-violet-100' },
   ];
 
-  const loadListings = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const firestoreListings = await getListings({
-        location: activeFilter === 'All' ? undefined : activeFilter,
-      });
-      
-      const displayListings: ListingDisplay[] = firestoreListings.map((listing) => ({
-        ...listing,
-        lastUpdated: formatRelativeTime(listing.updatedAt || listing.createdAt),
-        isOwn: listing.userId === currentUser?.uid,
-      }));
-
-      setListings(displayListings);
-    } catch (error) {
-      console.error('Error loading listings:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [activeFilter, currentUser?.uid]);
-
   useEffect(() => {
-    loadListings();
-  }, [loadListings]);
+    setIsLoading(true);
+
+    const unsubscribe = subscribeToActiveListings(
+      activeFilter === 'All' ? undefined : activeFilter,
+      (firestoreListings) => {
+        const displayListings: ListingDisplay[] = firestoreListings.map((listing) => ({
+          ...listing,
+          lastUpdated: formatRelativeTime(listing.updatedAt || listing.createdAt),
+          isOwn: listing.userId === currentUser?.uid,
+        }));
+
+        setListings(displayListings);
+        setIsLoading(false);
+      },
+    );
+
+    return unsubscribe;
+  }, [activeFilter, currentUser?.uid]);
 
 
   return (
@@ -161,9 +156,9 @@ const DashboardPage = () => {
                 >
                   <ListingCard
                     listing={listing}
-                    onListingDeleted={loadListings}
-                    onListingCompleted={loadListings}
-                    onListingEdited={loadListings}
+                    onListingDeleted={() => undefined}
+                    onListingCompleted={() => undefined}
+                    onListingEdited={() => undefined}
                     colorOverride={COLOR_CYCLE[index % COLOR_CYCLE.length]}
                   />
                 </motion.div>
