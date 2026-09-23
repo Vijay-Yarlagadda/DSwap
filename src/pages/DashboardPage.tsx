@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import FilterChips from '../components/FilterChips';
 import ListingCard from '../components/ListingCard';
@@ -156,9 +156,6 @@ const DashboardPage = () => {
                 >
                   <ListingCard
                     listing={listing}
-                    onListingDeleted={() => undefined}
-                    onListingCompleted={() => undefined}
-                    onListingEdited={() => undefined}
                     colorOverride={COLOR_CYCLE[index % COLOR_CYCLE.length]}
                   />
                 </motion.div>
@@ -171,7 +168,6 @@ const DashboardPage = () => {
       <AddListingModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
-        onListingAdded={loadListings}
       />
     </div>
   );
